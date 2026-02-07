@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import MainLayout from "../components/layout/MainLayout";
 import PageHeader from "../components/layout/PageHeader";
 import useAuth from "../hooks/useAuth";
+import "./Dashboard.css";
 
 /**
  * Dashboard Page
@@ -15,12 +16,12 @@ const Dashboard = () => {
   const quickActions = [
     {
       title: "Upload Document",
-      description: "Upload a new document with metadata",
+      description: "Upload new files with metadata",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="48"
-          height="48"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -33,15 +34,16 @@ const Dashboard = () => {
       ),
       action: () => navigate("/upload"),
       color: "primary",
+      stats: "Quick & Easy",
     },
     {
       title: "Search Documents",
-      description: "Find documents using filters",
+      description: "Find files using advanced filters",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="48"
-          height="48"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -53,15 +55,16 @@ const Dashboard = () => {
       ),
       action: () => navigate("/search"),
       color: "success",
+      stats: "Fast Search",
     },
     {
-      title: "Admin Panel",
-      description: "Manage users and settings",
+      title: "User Management",
+      description: "Manage users and permissions",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="48"
-          height="48"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -74,115 +77,211 @@ const Dashboard = () => {
         </svg>
       ),
       action: () => navigate("/admin"),
+      color: "info",
+      stats: "Admin Only",
+    },
+  ];
+
+  const stats = [
+    {
+      label: "Total Documents",
+      value: "1,234",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+      ),
+      color: "primary",
+      change: "+12.5%",
+    },
+    {
+      label: "Uploaded Today",
+      value: "45",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+      ),
+      color: "success",
+      change: "+8.2%",
+    },
+    {
+      label: "Active Users",
+      value: "89",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      ),
+      color: "info",
+      change: "+4.3%",
+    },
+    {
+      label: "Storage Used",
+      value: "78%",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+      ),
       color: "warning",
+      change: "+2.1%",
     },
   ];
 
   return (
     <MainLayout>
-      <PageHeader
-        title={`Welcome${user?.name ? ", " + user.name : ""}!`}
-        subtitle="Manage your documents efficiently"
-      />
-
-      <div className="container-fluid">
-        {/* Welcome Card */}
-        <div className="row mb-4">
-          <div className="col-12">
-            <div
-              className="card border-0 shadow-sm bg-gradient"
-              style={{
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              }}
-            >
-              <div className="card-body p-4 text-white">
-                <h3 className="mb-2">Document Management Made Easy</h3>
-                <p className="mb-0 opacity-75">
-                  Upload, search, and manage your documents with ease. Get
-                  started by selecting a quick action below.
-                </p>
-              </div>
-            </div>
+      <div className="dashboard-container">
+        {/* Header Section */}
+        <div className="dashboard-header">
+          <div>
+            <h1 className="dashboard-title">
+              Welcome back{user?.name ? ", " + user.name : ""}!
+            </h1>
+            <p className="dashboard-subtitle">
+              Here's what's happening with your documents today.
+            </p>
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="row g-4 mb-4">
-          {quickActions.map((action, index) => (
-            <div key={index} className="col-lg-4 col-md-6">
-              <div
-                className="card border-0 shadow-sm h-100 cursor-pointer"
-                onClick={action.action}
-                style={{ cursor: "pointer", transition: "transform 0.2s" }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-5px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                }}
-              >
-                <div className="card-body p-4 text-center">
-                  <div className={`text-${action.color} mb-3`}>
-                    {action.icon}
-                  </div>
-                  <h5 className="card-title mb-2">{action.title}</h5>
-                  <p className="card-text text-muted">{action.description}</p>
-                  <button className={`btn btn-${action.color} mt-2`}>
-                    Get Started
-                  </button>
+        {/* Stats Cards */}
+        <div className="stats-grid">
+          {stats.map((stat, index) => (
+            <div key={index} className="stat-card">
+              <div className="stat-card-content">
+                <div className="stat-info">
+                  <p className="stat-label">{stat.label}</p>
+                  <h3 className="stat-value">{stat.value}</h3>
+                  <span className="stat-change positive">{stat.change}</span>
+                </div>
+                <div className={`stat-icon stat-icon-${stat.color}`}>
+                  {stat.icon}
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* System Info */}
-        <div className="row">
-          <div className="col-12">
-            <div className="card border-0 shadow-sm">
-              <div className="card-body p-4">
-                <h5 className="card-title mb-3">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="me-2"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                  </svg>
-                  System Information
-                </h5>
-                <div className="row g-3">
-                  <div className="col-md-4">
-                    <div className="p-3 bg-light rounded">
-                      <small className="text-muted d-block mb-1">Status</small>
-                      <strong className="text-success">
-                        <span className="badge bg-success">Online</span>
-                      </strong>
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="p-3 bg-light rounded">
-                      <small className="text-muted d-block mb-1">Version</small>
-                      <strong>1.0.0</strong>
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="p-3 bg-light rounded">
-                      <small className="text-muted d-block mb-1">
-                        Environment
-                      </small>
-                      <strong>{import.meta.env.MODE}</strong>
-                    </div>
-                  </div>
-                </div>
+        {/* Quick Actions */}
+        <div className="section-header">
+          <h2 className="section-title">Quick Actions</h2>
+          <p className="section-subtitle">
+            Common tasks to help you manage your documents
+          </p>
+        </div>
+        
+        <div className="quick-actions-grid">
+          {quickActions.map((action, index) => (
+            <div
+              key={index}
+              className="action-card"
+              onClick={action.action}
+            >
+              <div className={`action-icon action-icon-${action.color}`}>
+                {action.icon}
               </div>
+              <div className="action-content">
+                <h4 className="action-title">{action.title}</h4>
+                <p className="action-description">{action.description}</p>
+                <span className="action-badge">{action.stats}</span>
+              </div>
+              <div className="action-arrow">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* System Status */}
+        <div className="system-status-card">
+          <div className="system-status-header">
+            <h3 className="system-status-title">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              System Status
+            </h3>
+          </div>
+          <div className="system-status-grid">
+            <div className="system-status-item">
+              <span className="status-label">Server Status</span>
+              <span className="status-value status-online">
+                <span className="status-dot"></span>
+                Online
+              </span>
+            </div>
+            <div className="system-status-item">
+              <span className="status-label">App Version</span>
+              <span className="status-value">1.0.0</span>
+            </div>
+            <div className="system-status-item">
+              <span className="status-label">Environment</span>
+              <span className="status-value">{import.meta.env.MODE}</span>
+            </div>
+            <div className="system-status-item">
+              <span className="status-label">Last Updated</span>
+              <span className="status-value">2 minutes ago</span>
             </div>
           </div>
         </div>

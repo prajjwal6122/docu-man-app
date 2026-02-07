@@ -1,7 +1,7 @@
 .main-layout {
   display: flex;
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: var(--dms-bg-secondary);
 }
 
 .main-wrapper {
@@ -13,8 +13,8 @@
 
 .main-content {
   flex: 1;
-  padding: 1.5rem;
-  background-color: #f9fafb;
+  padding: var(--dms-spacing-lg);
+  background-color: var(--dms-bg-secondary);
 }
 
 /* Desktop: Add margin for sidebar */
@@ -31,6 +31,14 @@
   }
 
   .main-content {
-    padding: 1rem;
+    padding: var(--dms-spacing-sm);
   }
 }
+
+/* Tablet */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .main-content {
+    padding: var(--dms-spacing-md);
+  }
+}
+

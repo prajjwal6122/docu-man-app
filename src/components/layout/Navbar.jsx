@@ -17,7 +17,7 @@ const Navbar = ({ onToggleSidebar }) => {
   };
 
   return (
-    <nav className="navbar navbar-expand navbar-light bg-white border-bottom shadow-sm">
+    <nav className="navbar navbar-expand navbar-light bg-white">
       <div className="container-fluid">
         {/* Mobile Menu Toggle */}
         <button
@@ -49,23 +49,23 @@ const Navbar = ({ onToggleSidebar }) => {
         <div className="navbar-nav ms-auto">
           <div className="nav-item dropdown">
             <button
-              className="btn btn-link nav-link dropdown-toggle text-dark text-decoration-none"
+              className="btn btn-link nav-link dropdown-toggle text-dark text-decoration-none d-flex align-items-center"
               id="userDropdown"
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <span className="me-2">{user?.name || user?.mobile || 'User'}</span>
+              <span className="me-2 d-none d-md-inline">{user?.name || user?.mobile || 'User'}</span>
               <span className="badge bg-primary rounded-circle">
                 {(user?.name || 'U')[0].toUpperCase()}
               </span>
             </button>
             <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
               <li>
-                <span className="dropdown-item-text">
+                <div className="dropdown-item-text">
                   <strong>{user?.name || 'User'}</strong>
                   <br />
                   <small className="text-muted">{user?.mobile || ''}</small>
-                </span>
+                </div>
               </li>
               <li><hr className="dropdown-divider" /></li>
               <li>
@@ -78,7 +78,6 @@ const Navbar = ({ onToggleSidebar }) => {
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
-                    className="me-2"
                   >
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                     <polyline points="16 17 21 12 16 7"></polyline>
