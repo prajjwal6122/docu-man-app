@@ -29,16 +29,33 @@ const LoginPage = () => {
       const response = await authService.generateOTP(mobile);
       console.log('OTP Response:', response);
       
+      // Check if response indicates success
+      if (response.status === false) {
+        // API returned error in success response
+        toast.error(response.data || response.message || 'Failed to send OTP');
+        return;
+      }
+      
       toast.success('OTP sent successfully to ' + mobile);
       setStep('otp');
     } catch (error) {
       console.error('OTP Error:', error);
       console.error('Error Response:', error.response?.data);
       
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        'Failed to send OTP. Please try again.';
+      // Handle different error response formats
+      const errorData = error.response?.data;
+      let errorMessage = 'Failed to send OTP. Please try again.';
+      
+      if (errorData) {
+        if (errorData.data && typeof errorData.data === 'string') {
+          errorMessage = errorData.data;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -54,6 +71,12 @@ const LoginPage = () => {
       const response = await authService.validateOTP(mobileNumber, otp);
       console.log('Validate OTP Response:', response);
       
+      // Check if response indicates failure
+      if (response.status === false) {
+        toast.error(response.data || response.message || 'Invalid OTP');
+        return;
+      }
+      
       // Store token and user data
       if (response.token) {
         login(response.token, response.user || { mobile: mobileNumber });
@@ -68,10 +91,20 @@ const LoginPage = () => {
       console.error('Verify OTP Error:', error);
       console.error('Error Response:', error.response?.data);
       
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        'Invalid OTP. Please try again.';
+      // Handle different error response formats
+      const errorData = error.response?.data;
+      let errorMessage = 'Invalid OTP. Please try again.';
+      
+      if (errorData) {
+        if (errorData.data && typeof errorData.data === 'string') {
+          errorMessage = errorData.data;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast.error(errorMessage);
     } finally {
       setLoading(false);
