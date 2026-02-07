@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getErrorMessage } from '../utils/helpers';
 
 /**
  * Page Error Boundary
@@ -75,7 +76,7 @@ function PageErrorFallback({ error, pageName }) {
               {process.env.NODE_ENV === 'development' && error && (
                 <div className="alert alert-danger text-start mb-3">
                   <small>
-                    <strong>Error:</strong> {error.toString()}
+                    <strong>Error:</strong> {getErrorMessage(error)}
                   </small>
                 </div>
               )}

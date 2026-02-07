@@ -3,6 +3,43 @@
  */
 
 /**
+ * Safely convert error to string message
+ * Handles various error types and formats
+ */
+export const getErrorMessage = (error) => {
+  if (!error) return 'Unknown error';
+  
+  // If it's an Error object with a message
+  if (error.message) {
+    return error.message;
+  }
+  
+  // If it's a string
+  if (typeof error === 'string') {
+    return error;
+  }
+  
+  // If it's an object with a message property
+  if (error.response?.data?.message) {
+    return error.response.data.message;
+  }
+  
+  // If it's an axios error
+  if (error.response?.data) {
+    return typeof error.response.data === 'string' 
+      ? error.response.data 
+      : JSON.stringify(error.response.data);
+  }
+  
+  // Try to stringify safely
+  try {
+    return String(error);
+  } catch (e) {
+    return 'An error occurred';
+  }
+};
+
+/**
  * Format date to YYYY-MM-DD   
  */
 export const formatDate = (date) => {
@@ -62,6 +99,7 @@ export const formatFileSize = (bytes) => {
 };
 
 export default {
+  getErrorMessage,
   formatDate,
   downloadFile,
   getFileExtension,

@@ -1,4 +1,5 @@
 import React from 'react';
+import { getErrorMessage } from '../utils/helpers';
 
 /**
  * Error Boundary Component
@@ -90,7 +91,7 @@ class ErrorBoundary extends React.Component {
                         <h6 className="alert-heading">Error Details:</h6>
                         <hr />
                         <p className="mb-2">
-                          <strong>Message:</strong> {this.state.error.toString()}
+                          <strong>Message:</strong> {getErrorMessage(this.state.error)}
                         </p>
                         {this.state.errorInfo && (
                           <details className="mt-2">
