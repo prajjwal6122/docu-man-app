@@ -45,7 +45,7 @@ export const validators = {
     if (!value) {
       return `${fieldName} is required`;
     }
-    if (!(value instanceofDate) && isNaN(Date.parse(value))) {
+    if (!(value instanceof Date) && isNaN(Date.parse(value))) {
       return `Please enter a valid ${fieldName.toLowerCase()}`;
     }
     return '';
