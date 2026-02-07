@@ -1,0 +1,31 @@
+.page-header {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.page-subtitle {
+  font-size: 14px;
+}
+
+.page-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+@media (max-width: 576px) {
+  .page-header {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+}

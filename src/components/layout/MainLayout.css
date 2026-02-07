@@ -1,0 +1,36 @@
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 1.5rem;
+  background-color: #f9fafb;
+}
+
+/* Desktop: Add margin for sidebar */
+@media (min-width: 992px) {
+  .main-wrapper {
+    margin-left: 260px;
+  }
+}
+
+/* Mobile: Full width */
+@media (max-width: 991.98px) {
+  .main-wrapper {
+    margin-left: 0;
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
+}
