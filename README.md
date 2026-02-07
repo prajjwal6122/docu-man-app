@@ -14,6 +14,10 @@ A modern, responsive document management system built with React and Bootstrap. 
 
 ### Technical Features
 - **Responsive Design**: Mobile-first design that works on all devices (375px+)
+- **Error Boundaries**: Comprehensive error handling to prevent app crashes
+  - App-level error boundary catches all errors
+  - Page-level error boundaries isolate errors to individual pages
+  - Beautiful fallback UI with error details in development mode
 - **Context API**: Global state management for authentication and notifications
 - **Protected Routes**: Secure routing with authentication checks
 - **Custom Hooks**: Reusable logic with useAuth, useToast, and useDebounce
@@ -119,17 +123,19 @@ docu-man-app/
 │   │   │   ├── Navbar.jsx
 │   │   │   ├── PageHeader.jsx
 │   │   │   └── Sidebar.jsx
-│   │   └── ui/           # Base UI components
-│   │       ├── Button.jsx
-│   │       ├── DatePicker.jsx
-│   │       ├── EmptyState.jsx
-│   │       ├── FileUpload.jsx
-│   │       ├── Input.jsx
-│   │       ├── Modal.jsx
-│   │       ├── Select.jsx
-│   │       ├── Table.jsx
-│   │       ├── TagInput.jsx
-│   │       └── Toast.jsx
+│   │   ├── ui/           # Base UI components
+│   │   │   ├── Button.jsx
+│   │   │   ├── DatePicker.jsx
+│   │   │   ├── EmptyState.jsx
+│   │   │   ├── FileUpload.jsx
+│   │   │   ├── Input.jsx
+│   │   │   ├── Modal.jsx
+│   │   │   ├── Select.jsx
+│   │   │   ├── Table.jsx
+│   │   │   ├── TagInput.jsx
+│   │   │   └── Toast.jsx
+│   │   ├── ErrorBoundary.jsx       # App-level error boundary
+│   │   └── PageErrorBoundary.jsx   # Page-level error boundary
 │   ├── context/          # React Context providers
 │   │   ├── AuthContext.jsx
 │   │   └── ToastContext.jsx
@@ -265,6 +271,11 @@ FormData with:
 - **File Upload**: Drag-and-drop, file type/size validation, image preview
 - **Tag Input**: Chip-style tags, autocomplete from existing tags, add on Enter/comma
 - **Date Picker**: Calendar widget, date range validation, formatted display
+- **Error Boundaries**: 
+  - App-level boundary catches all errors and shows beautiful fallback
+  - Page-level boundaries isolate errors to prevent full app crash
+  - Development mode shows detailed error messages and stack traces
+  - Production mode shows user-friendly error messages
 
 ## 🔐 Authentication Flow
 
