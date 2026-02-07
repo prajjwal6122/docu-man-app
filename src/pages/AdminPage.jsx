@@ -6,7 +6,8 @@ import useToast from '../hooks/useToast';
 
 /**
  * Admin Page - Static User Creation
- * This is a UI-only page with no backend integration
+ * This is a UI-only page for creating user accounts
+ * Note: The OTP-based login system allows any mobile number to register/login
  */
 const AdminPage = () => {
   const [loading, setLoading] = useState(false);
@@ -34,7 +35,7 @@ const AdminPage = () => {
   return (
     <MainLayout>
       <PageHeader
-        title="Admin Panel"
+        title="User Management"
         subtitle="Create and manage user accounts"
       />
 
@@ -63,7 +64,7 @@ const AdminPage = () => {
                   Create New User
                 </h5>
                 <p className="text-muted mb-4">
-                  Fill in the form below to create a new user account. This is a static demo - no actual users will be created.
+                  Fill in the form below to create a new user account. This is a static interface - in production, this would be connected to a backend API.
                 </p>
                 <UserCreationForm onSubmit={handleCreateUser} loading={loading} />
               </div>
@@ -159,7 +160,7 @@ const AdminPage = () => {
                   Note
                 </h6>
                 <p className="text-muted small mb-0">
-                  This is a static demonstration page. In production, this would be connected to the backend API for actual user creation and management. The created users are stored in local state only and will be cleared on page refresh.
+                  <strong>Note:</strong> This is a static demonstration interface. Users can login/register directly using OTP-based authentication on the login page. In a production environment, this interface would be connected to backend APIs for user management.
                 </p>
               </div>
             </div>

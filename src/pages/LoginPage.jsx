@@ -25,14 +25,24 @@ const LoginPage = () => {
     setMobileNumber(mobile);
     
     try {
-      // Call API to send OTP
+      // Call API to send OTP (works for both new and existing users)
       const response = await authService.generateOTP(mobile);
       console.log('OTP Response:', response);
       
-      // Check if response indicates success
-      if (response.status === false) {
-        // API returned error in success response
-        toast.error(response.data || response.message || 'Failed to send OTP');
+      // Check if OTP was sent successfully
+      // For new users, the API might return status: false with message about not registered
+      // We'll still proceed to OTP step as the OTP serves as registration
+      if (response.status === false && response.data) {
+        const message = response.data.toLowerCase();
+        // If message indicates user is not registered, treat it as new user registration
+        if (message.includes('not') && message.includes('registered')) {
+          toast.info('New user detected. An OTP will be sent for registration.');
+          // Still proceed to OTP step for new user registration
+          setStep('otp');
+          return;
+        }
+        // For other errors, show error message
+        toast.error(response.data || 'Failed to send OTP');
         return;
       }
       
@@ -44,8 +54,18 @@ const LoginPage = () => {
       
       // Handle different error response formats
       const errorData = error.response?.data;
-      let errorMessage = 'Failed to send OTP. Please try again.';
       
+      // Check if it's a "not registered" case
+      if (errorData && errorData.data && typeof errorData.data === 'string') {
+        const message = errorData.data.toLowerCase();
+        if (message.includes('not') && message.includes('registered')) {
+          toast.info('New user detected. An OTP will be sent for registration.');
+          setStep('otp');
+          return;
+        }
+      }
+      
+      let errorMessage = 'Failed to send OTP. Please try again.';
       if (errorData) {
         if (errorData.data && typeof errorData.data === 'string') {
           errorMessage = errorData.data;
@@ -128,6 +148,11 @@ const LoginPage = () => {
                 <div className="text-center mb-4">
                   <h2 className="text-primary fw-bold mb-2">Docu-Man</h2>
                   <p className="text-muted">Document Management System</p>
+                  {step === 'mobile' && (
+                    <small className="text-muted d-block mt-2">
+                      Login or Register with OTP
+                    </small>
+                  )}
                 </div>
 
                 {/* Step Indicator */}
@@ -192,7 +217,7 @@ const LoginPage = () => {
                           <line x1="12" y1="16" x2="12" y2="12"></line>
                           <line x1="12" y1="8" x2="12.01" y2="8"></line>
                         </svg>
-                        Note: Only registered mobile numbers can log in. Contact admin to register.
+                        Enter your mobile number to receive an OTP for login or registration.
                       </small>
                     </div>
                   )}
