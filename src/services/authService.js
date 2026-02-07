@@ -9,7 +9,7 @@ const authService = {
    */
   async generateOTP(mobile) {
     try {
-      const response = await apiClient.post('/generateOTP', { mobile });
+      const response = await apiClient.post('/generateOTP', { mobile_number: mobile });
       return response.data;
     } catch (error) {
       throw error;
@@ -24,7 +24,7 @@ const authService = {
    */
   async validateOTP(mobile, otp) {
     try {
-      const response = await apiClient.post('/validateOTP', { mobile, otp });
+      const response = await apiClient.post('/validateOTP', { mobile_number: mobile, otp });
       return response.data;
     } catch (error) {
       throw error;

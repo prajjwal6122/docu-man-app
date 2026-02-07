@@ -61,24 +61,33 @@ const SearchDocuments = () => {
     setSearched(true);
     
     try {
-      // Build search params
-      const params = {};
-      if (filters.majorHead) params.major_head = filters.majorHead;
-      if (filters.minorHead) params.minor_head = filters.minorHead;
-      if (filters.tags.length > 0) params.tags = filters.tags.join(',');
-      if (filters.fromDate) params.from_date = formatDate(filters.fromDate);
-      if (filters.toDate) params.to_date = formatDate(filters.toDate);
+      // Build search params matching API expectations
+      const params = {
+        major_head: filters.majorHead || '',
+        minor_head: filters.minorHead || '',
+        from_date: filters.fromDate ? formatDate(filters.fromDate) : '',
+        to_date: filters.toDate ? formatDate(filters.toDate) : '',
+        tags: filters.tags.map(tag => ({ tag_name: tag })), // Convert to array of objects
+        uploaded_by: '',
+        start: 0,
+        length: 100, // Get first 100 results
+        filterId: '',
+        search: {
+          value: '' // Can be extended to include text search
+        }
+      };
 
       const response = await documentService.searchDocuments(params);
       
-      // Assuming response.data is an array or response.documents
-      const results = response.documents || response.data || response || [];
-      setDocuments(Array.isArray(results) ? results : []);
+      // Handle different response formats
+      const results = response.data || response.documents || response || [];
+      const documents = Array.isArray(results) ? results : [];
+      setDocuments(documents);
       
-      if (results.length === 0) {
+      if (documents.length === 0) {
         toast.info('No documents found matching your search criteria');
       } else {
-        toast.success(`Found ${results.length} document(s)`);
+        toast.success(`Found ${documents.length} document(s)`);
       }
     } catch (error) {
       const errorMessage =
