@@ -91,7 +91,15 @@ const LoginPage = () => {
       toast.error(errorMessage);
     } finally {
       setLoading(false);
-    }Check if using master credentials for frontend testing
+    }
+  };
+
+  // Handle OTP verification and login
+  const handleVerifyOTP = async (otp) => {
+    setLoading(true);
+    
+    try {
+      // Check if using master credentials for frontend testing
       if (mobileNumber === MASTER_MOBILE && otp === MASTER_OTP) {
         // Mock successful login for testing
         const mockToken = 'test_token_' + Date.now();
@@ -108,14 +116,6 @@ const LoginPage = () => {
         return;
       }
       
-      // 
-  };
-
-  // Handle OTP verification and login
-  const handleVerifyOTP = async (otp) => {
-    setLoading(true);
-    
-    try {
       // Validate OTP and get auth token
       const response = await authService.validateOTP(mobileNumber, otp);
       console.log('Validate OTP Response:', response);
