@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
+import PageErrorBoundary from '../components/PageErrorBoundary';
 
 // Placeholder pages (to be created)
 const LoginPage = React.lazy(() => import('../pages/LoginPage'));
@@ -26,14 +27,23 @@ const AppRoutes = () => {
       >
         <Routes>
           {/* Public Routes */}
-          <Route path="/login" element={<LoginPage />} />
+          <Route 
+            path="/login" 
+            element={
+              <PageErrorBoundary pageName="Login">
+                <LoginPage />
+              </PageErrorBoundary>
+            } 
+          />
 
           {/* Protected Routes */}
           <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <PageErrorBoundary pageName="Dashboard">
+                  <Dashboard />
+                </PageErrorBoundary>
               </ProtectedRoute>
             }
           />
@@ -41,7 +51,9 @@ const AppRoutes = () => {
             path="/upload"
             element={
               <ProtectedRoute>
-                <UploadDocument />
+                <PageErrorBoundary pageName="Upload Document">
+                  <UploadDocument />
+                </PageErrorBoundary>
               </ProtectedRoute>
             }
           />
@@ -49,7 +61,9 @@ const AppRoutes = () => {
             path="/search"
             element={
               <ProtectedRoute>
-                <SearchDocuments />
+                <PageErrorBoundary pageName="Search Documents">
+                  <SearchDocuments />
+                </PageErrorBoundary>
               </ProtectedRoute>
             }
           />
@@ -57,7 +71,9 @@ const AppRoutes = () => {
             path="/admin"
             element={
               <ProtectedRoute>
-                <AdminPage />
+                <PageErrorBoundary pageName="Admin Panel">
+                  <AdminPage />
+                </PageErrorBoundary>
               </ProtectedRoute>
             }
           />
