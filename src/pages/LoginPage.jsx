@@ -6,6 +6,10 @@ import useAuth from '../hooks/useAuth';
 import useToast from '../hooks/useToast';
 import authService from '../services/authService';
 
+// Master credentials for frontend testing (development only)
+const MASTER_MOBILE = '9999999999';
+const MASTER_OTP = '123456';
+
 /**
  * Login Page Component
  * Handles OTP-based authentication
@@ -25,6 +29,14 @@ const LoginPage = () => {
     setMobileNumber(mobile);
     
     try {
+      // Check if using master mobile for frontend testing
+      if (mobile === MASTER_MOBILE) {
+        toast.success('Test mode: OTP is 123456');
+        setStep('otp');
+        setLoading(false);
+        return;
+      }
+      
       // Call API to send OTP (works for both new and existing users)
       const response = await authService.generateOTP(mobile);
       console.log('OTP Response:', response);
@@ -79,7 +91,24 @@ const LoginPage = () => {
       toast.error(errorMessage);
     } finally {
       setLoading(false);
-    }
+    }Check if using master credentials for frontend testing
+      if (mobileNumber === MASTER_MOBILE && otp === MASTER_OTP) {
+        // Mock successful login for testing
+        const mockToken = 'test_token_' + Date.now();
+        const mockUser = {
+          mobile: mobileNumber,
+          name: 'Test User',
+          id: 'test_user_001'
+        };
+        
+        login(mockToken, mockUser);
+        toast.success('Login successful! (Test Mode)');
+        navigate('/dashboard', { replace: true });
+        setLoading(false);
+        return;
+      }
+      
+      // 
   };
 
   // Handle OTP verification and login
@@ -202,7 +231,13 @@ const LoginPage = () => {
                     onResend={() => handleSendOTP(mobileNumber)}
                     loading={loading}
                   />
-                )}
+                )}  <small className="text-success d-block mt-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="me-1">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Test Mode: Use mobile <strong>9999999999</strong> with OTP <strong>123456</strong>
+                      </small>
+                    
 
                 {/* Footer */}
                 <div className="text-center mt-4">
