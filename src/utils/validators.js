@@ -112,4 +112,35 @@ export const validators = {
   },
 };
 
+/**
+ * Validate username (4-20 characters, alphanumeric and underscore)
+ */
+export const validateUsername = (value) => {
+  if (!value) return '';
+  
+  if (value.length < 4 || value.length > 20) {
+    return 'Username must be between 4 and 20 characters';
+  }
+  
+  const usernameRegex = /^[a-zA-Z0-9_]+$/;
+  if (!usernameRegex.test(value)) {
+    return 'Username can only contain letters, numbers, and underscores';
+  }
+  
+  return '';
+};
+
+/**
+ * Validate password (minimum 6 characters)
+ */
+export const validatePassword = (value) => {
+  if (!value) return '';
+  
+  if (value.length < 6) {
+    return 'Password must be at least 6 characters long';
+  }
+  
+  return '';
+};
+
 export default validators;
