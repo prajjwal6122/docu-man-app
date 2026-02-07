@@ -4,6 +4,7 @@ import MobileNumberForm from '../components/forms/MobileNumberForm';
 import OTPForm from '../components/forms/OTPForm';
 import useAuth from '../hooks/useAuth';
 import useToast from '../hooks/useToast';
+import authService from '../services/authService';
 
 /**
  * Login Page Component
@@ -24,9 +25,8 @@ const LoginPage = () => {
     setMobileNumber(mobile);
     
     try {
-      // Call API to send OTP (this is simulated in demo)
-      // In production, this would call authService.sendOTP(mobile)
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      // Call API to send OTP
+      await authService.generateOTP(mobile);
       
       toast.success('OTP sent successfully to ' + mobile);
       setStep('otp');
@@ -45,13 +45,19 @@ const LoginPage = () => {
     setLoading(true);
     
     try {
-      // Call login function from AuthContext
-      await login(mobileNumber, otp);
+      // Validate OTP and get auth token
+      const response = await authService.validateOTP(mobileNumber, otp);
       
-      toast.success('Login successful!');
-      
-      // Redirect to dashboard
-      navigate('/dashboard', { replace: true });
+      // Store token and user data
+      if (response.token) {
+        login(response.token, response.user || { mobile: mobileNumber });
+        toast.success('Login successful!');
+        
+        // Redirect to dashboard
+        navigate('/dashboard', { replace: true });
+      } else {
+        throw new Error('Invalid response from server');
+      }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
@@ -69,12 +75,12 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+    <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light py-4">
       <div className="container">
         <div className="row justify-content-center">
-          <div className="col-md-6 col-lg-5">
+          <div className="col-12 col-sm-10 col-md-8 col-lg-5">
             <div className="card border-0 shadow-lg">
-              <div className="card-body p-5">
+              <div className="card-body p-3 p-sm-4 p-md-5">
                 {/* Logo/Title */}
                 <div className="text-center mb-4">
                   <h2 className="text-primary fw-bold mb-2">Docu-Man</h2>

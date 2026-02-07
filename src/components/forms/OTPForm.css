@@ -1,3 +1,10 @@
+.otp-input-container {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
 .otp-input {
   width: 50px;
   height: 60px;
@@ -6,22 +13,64 @@
   border: 2px solid #dee2e6;
   border-radius: 8px;
   transition: all 0.2s;
+  text-align: center;
+  /* Remove error icon background */
+  background-image: none !important;
+  padding: 0 !important;
 }
 
 .otp-input:focus {
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
   outline: none;
 }
 
 .otp-input.is-invalid {
   border-color: #dc3545;
+  background-image: none !important;
 }
 
+.otp-input:disabled {
+  background-color: #e9ecef;
+  opacity: 0.6;
+}
+
+/* Tablet devices */
+@media (max-width: 768px) {
+  .otp-input {
+    width: 45px;
+    height: 55px;
+    font-size: 22px;
+  }
+  
+  .otp-input-container {
+    gap: 0.4rem;
+  }
+}
+
+/* Mobile devices */
 @media (max-width: 576px) {
   .otp-input {
     width: 40px;
     height: 50px;
     font-size: 20px;
   }
+  
+  .otp-input-container {
+    gap: 0.3rem;
+  }
 }
+
+/* Small mobile devices */
+@media (max-width: 380px) {
+  .otp-input {
+    width: 35px;
+    height: 45px;
+    font-size: 18px;
+  }
+  
+  .otp-input-container {
+    gap: 0.25rem;
+  }
+}
+
