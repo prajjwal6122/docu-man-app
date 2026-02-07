@@ -1,0 +1,24 @@
+.empty-state {
+  padding: 3rem 1rem;
+}
+
+.empty-state-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty-state-title {
+  color: #111827;
+  font-weight: 600;
+}
+
+.empty-state-message {
+  font-size: 0.95rem;
+}
+
+@media (max-width: 576px) {
+  .empty-state {
+    padding: 2rem 1rem;
+  }
+}
