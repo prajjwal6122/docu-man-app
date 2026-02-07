@@ -6,7 +6,7 @@ import './OTPForm.css';
  * OTP Form Component
  * Handles 6-digit OTP input with auto-focus and auto-advance
  */
-const OTPForm = ({ onSubmit, onResend, onBack, loading, mobileNumber }) => {
+const OTPForm = ({ onSubmit, onResend, loading, mobileNumber = '' }) => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [resendTimer, setResendTimer] = useState(30);
@@ -92,7 +92,7 @@ const OTPForm = ({ onSubmit, onResend, onBack, loading, mobileNumber }) => {
     <form onSubmit={handleSubmit}>
       <div className="mb-3">
         <label className="form-label">
-          Enter OTP sent to {mobileNumber}
+          {mobileNumber ? `Enter OTP sent to ${mobileNumber}` : 'Enter OTP'}
         </label>
         <div className="otp-input-container d-flex justify-content-between gap-2 mb-2">
           {otp.map((digit, index) => (

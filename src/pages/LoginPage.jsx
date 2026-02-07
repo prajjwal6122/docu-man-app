@@ -26,13 +26,18 @@ const LoginPage = () => {
     
     try {
       // Call API to send OTP
-      await authService.generateOTP(mobile);
+      const response = await authService.generateOTP(mobile);
+      console.log('OTP Response:', response);
       
       toast.success('OTP sent successfully to ' + mobile);
       setStep('otp');
     } catch (error) {
+      console.error('OTP Error:', error);
+      console.error('Error Response:', error.response?.data);
+      
       const errorMessage =
         error.response?.data?.message ||
+        error.message ||
         'Failed to send OTP. Please try again.';
       toast.error(errorMessage);
     } finally {
@@ -47,6 +52,7 @@ const LoginPage = () => {
     try {
       // Validate OTP and get auth token
       const response = await authService.validateOTP(mobileNumber, otp);
+      console.log('Validate OTP Response:', response);
       
       // Store token and user data
       if (response.token) {
@@ -59,8 +65,12 @@ const LoginPage = () => {
         throw new Error('Invalid response from server');
       }
     } catch (error) {
+      console.error('Verify OTP Error:', error);
+      console.error('Error Response:', error.response?.data);
+      
       const errorMessage =
         error.response?.data?.message ||
+        error.message ||
         'Invalid OTP. Please try again.';
       toast.error(errorMessage);
     } finally {
@@ -132,7 +142,6 @@ const LoginPage = () => {
                     mobileNumber={mobileNumber}
                     onSubmit={handleVerifyOTP}
                     onResend={() => handleSendOTP(mobileNumber)}
-                    onBack={handleBackToMobile}
                     loading={loading}
                   />
                 )}
