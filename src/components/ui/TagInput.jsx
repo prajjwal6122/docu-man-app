@@ -24,11 +24,17 @@ const TagInput = ({
 
   useEffect(() => {
     if (inputValue.trim()) {
-      const filtered = suggestions.filter(
-        (s) =>
-          s.toLowerCase().includes(inputValue.toLowerCase()) &&
-          !tags.includes(s)
-      );
+      const filtered = suggestions
+        .filter((s) => {
+          // Handle both string suggestions and object suggestions with tag_name
+          const suggestionText = typeof s === "string" ? s : s?.tag_name || "";
+          return (
+            suggestionText.toLowerCase().includes(inputValue.toLowerCase()) &&
+            !tags.includes(suggestionText)
+          );
+        })
+        .map((s) => (typeof s === "string" ? s : s?.tag_name || ""));
+      
       setFilteredSuggestions(filtered);
       setShowSuggestions(filtered.length > 0);
     } else {
