@@ -29,15 +29,21 @@ const DocumentTable = ({ documents, onPreview, onDownload }) => {
       header: 'Tags',
       accessor: 'tags',
       width: '25%',
-      render: (row) => (
-        <div className="d-flex flex-wrap gap-1">
-          {row.tags?.split(',').map((tag, index) => (
-            <span key={index} className="badge bg-primary">
-              {tag.trim()}
-            </span>
-          ))}
-        </div>
-      ),
+      render: (row) => {
+        // Handle both array and comma-separated string formats
+        const tags = Array.isArray(row.tags) 
+          ? row.tags 
+          : (row.tags?.split(',') || []);
+        return (
+          <div className="d-flex flex-wrap gap-1">
+            {tags.map((tag, index) => (
+              <span key={index} className="badge bg-primary">
+                {typeof tag === 'string' ? tag.trim() : tag}
+              </span>
+            ))}
+          </div>
+        );
+      },
     },
     {
       header: 'File',

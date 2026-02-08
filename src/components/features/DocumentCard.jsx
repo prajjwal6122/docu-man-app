@@ -8,7 +8,10 @@ import './DocumentCard.css';
  * Displays search results in card format (mobile)
  */
 const DocumentCard = ({ document, onPreview, onDownload }) => {
-  const tags = document.tags?.split(',') || [];
+  // Handle both array and comma-separated string formats
+  const tags = Array.isArray(document.tags) 
+    ? document.tags 
+    : (document.tags?.split(',') || []);
 
   return (
     <div className="document-card card border-0 shadow-sm mb-3">
