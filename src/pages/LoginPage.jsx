@@ -6,11 +6,10 @@ import useAuth from '../hooks/useAuth';
 import useToast from '../hooks/useToast';
 import authService from '../services/authService';
 
-// Master credentials for frontend testing (development only)
+// Demo credentials for testing (works in both development and production)
 // DEMO MODE: Mocks all API responses for testing without backend
 const MASTER_MOBILE = '9999999999';
 const MASTER_OTP = '123456';
-const IS_DEVELOPMENT = import.meta.env.DEV;
 const ENABLE_TEST_MODE = true; // Enables demo mode with mocked API responses
 
 /**
@@ -32,11 +31,11 @@ const LoginPage = () => {
     setMobileNumber(mobile);
 
     try {
-      // Check if using master mobile for frontend testing (development only)
-      if (IS_DEVELOPMENT && ENABLE_TEST_MODE && mobile === MASTER_MOBILE) {
-        console.log("✅ Test mode activated for mobile:", mobile);
-        console.warn("⚠️ Test mode: Mock token won't work with real API!");
-        toast.success("Test mode: OTP is 123456");
+      // Check if using master mobile for demo mode
+      if (ENABLE_TEST_MODE && mobile === MASTER_MOBILE) {
+        console.log("✅ Demo mode activated for mobile:", mobile);
+        console.warn("⚠️ Demo mode: Mock token won't work with real API!");
+        toast.success("Demo mode: OTP is 123456");
         setStep("otp");
         setLoading(false);
         return;
@@ -154,17 +153,16 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      // Check if using master credentials for frontend testing (development only)
+      // Check if using master credentials for demo mode
       if (
-        IS_DEVELOPMENT &&
         ENABLE_TEST_MODE &&
         mobileNumber === MASTER_MOBILE &&
         otp === MASTER_OTP
       ) {
-        console.log("✅ Test mode login activated");
+        console.log("✅ Demo mode login activated");
         console.warn("⚠️ WARNING: Mock token won't work with real API endpoints!");
         console.warn("⚠️ Use a real mobile number to test API functionality");
-        // Mock successful login for testing
+        // Mock successful login for demo mode
         const mockToken = "test_token_" + Date.now();
         const mockUser = {
           mobile: mobileNumber,
@@ -321,8 +319,8 @@ const LoginPage = () => {
                   />
                 )}
 
-                {/* Test Mode Info - Only in Development */}
-                {IS_DEVELOPMENT && ENABLE_TEST_MODE && (
+                {/* Demo Mode Info */}
+                {ENABLE_TEST_MODE && (
                   <div className="text-center mt-3">
                     <div className="alert alert-info mb-0" role="alert">
                       <h6 className="alert-heading mb-2">
@@ -353,7 +351,7 @@ const LoginPage = () => {
                     </div>
                   </div>
                 )}
-                {IS_DEVELOPMENT && !ENABLE_TEST_MODE && (
+                {!ENABLE_TEST_MODE && (
                   <div className="text-center mt-3">
                     <small className="text-info d-block">
                       <svg
