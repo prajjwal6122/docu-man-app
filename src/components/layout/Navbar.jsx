@@ -78,54 +78,46 @@ const Navbar = ({ onToggleSidebar }) => {
           <div className="flex-grow-1"></div>
 
           {/* User Info & Logout */}
-          <div className="navbar-nav ms-auto">
-            <div className="nav-item dropdown">
-              <button
-                className="btn btn-link nav-link dropdown-toggle text-dark text-decoration-none d-flex align-items-center"
-                id="userDropdown"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <span className="me-2 d-none d-md-inline">
-                  {user?.name || user?.mobile || "User"}
-                </span>
-                <span className="badge bg-primary rounded-circle">
+          <div className="navbar-nav ms-auto d-flex align-items-center">
+            <div className="d-flex align-items-center gap-3">
+              {/* User Info */}
+              <div className="d-flex align-items-center gap-2">
+                <span className="badge bg-primary rounded-circle" style={{ width: '35px', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
                   {(user?.name || "U")[0].toUpperCase()}
                 </span>
-              </button>
-              <ul
-                className="dropdown-menu dropdown-menu-end"
-                aria-labelledby="userDropdown"
-              >
-                <li>
-                  <div className="dropdown-item-text">
-                    <strong>{user?.name || "User"}</strong>
-                    <br />
-                    <small className="text-muted">{user?.mobile || ""}</small>
+                <div className="d-none d-md-block">
+                  <div className="fw-semibold" style={{ fontSize: '14px', lineHeight: '1.2' }}>
+                    {user?.name || "User"}
                   </div>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li>
-                  <button className="dropdown-item" onClick={handleLogout}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                      <polyline points="16 17 21 12 16 7"></polyline>
-                      <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    Logout
-                  </button>
-                </li>
-              </ul>
+                  {user?.mobile && (
+                    <small className="text-muted" style={{ fontSize: '12px' }}>
+                      {user.mobile}
+                    </small>
+                  )}
+                </div>
+              </div>
+              
+              {/* Logout Button */}
+              <button 
+                className="btn btn-outline-danger btn-sm d-flex align-items-center gap-1"
+                onClick={handleLogout}
+                title="Logout"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span className="d-none d-md-inline">Logout</span>
+              </button>
             </div>
           </div>
         </div>
