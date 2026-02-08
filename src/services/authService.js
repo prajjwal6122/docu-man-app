@@ -10,9 +10,31 @@ const authService = {
    */
   async generateOTP(mobile) {
     try {
-      const response = await apiClient.post('/generateOTP', { mobile_number: mobile });
+      console.log("🔄 Calling generateOTP API for:", mobile);
+      console.log("📍 API URL:", import.meta.env.VITE_API_BASE_URL + '/generateOTP');
+      
+      const requestBody = { mobile_number: mobile };
+      console.log("📤 Request body:", requestBody);
+      
+      const response = await apiClient.post('/generateOTP', requestBody);
+      
+      console.log("✅ generateOTP API Success:", response.status);
+      console.log("📥 Response data:", response.data);
+      
       return response.data;
     } catch (error) {
+      console.error("❌ generateOTP API Error:", error.message);
+      
+      if (error.response) {
+        console.error("📥 Error response status:", error.response.status);
+        console.error("📥 Error response data:", error.response.data);
+      } else if (error.request) {
+        console.error("❌ No response received from server");
+        console.error("Request details:", error.request);
+      } else {
+        console.error("❌ Error setting up request:", error.message);
+      }
+      
       throw error;
     }
   },
@@ -25,9 +47,31 @@ const authService = {
    */
   async validateOTP(mobile, otp) {
     try {
-      const response = await apiClient.post('/validateOTP', { mobile_number: mobile, otp });
+      console.log("🔄 Calling validateOTP API for:", mobile);
+      console.log("📍 API URL:", import.meta.env.VITE_API_BASE_URL + '/validateOTP');
+      
+      const requestBody = { mobile_number: mobile, otp: otp };
+      console.log("📤 Request body:", requestBody);
+      
+      const response = await apiClient.post('/validateOTP', requestBody);
+      
+      console.log("✅ validateOTP API Success:", response.status);
+      console.log("📥 Response data:", response.data);
+      
       return response.data;
     } catch (error) {
+      console.error("❌ validateOTP API Error:", error.message);
+      
+      if (error.response) {
+        console.error("📥 Error response status:", error.response.status);
+        console.error("📥 Error response data:", error.response.data);
+      } else if (error.request) {
+        console.error("❌ No response received from server");
+        console.error("Request details:", error.request);
+      } else {
+        console.error("❌ Error setting up request:", error.message);
+      }
+      
       throw error;
     }
   },
