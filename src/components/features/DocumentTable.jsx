@@ -8,12 +8,24 @@ import { format } from 'date-fns';
  * Displays search results in table format (desktop)
  */
 const DocumentTable = ({ documents, onPreview, onDownload }) => {
+  // Safely format date
+  const formatDocumentDate = (dateStr) => {
+    if (!dateStr) return 'N/A';
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return 'N/A';
+      return format(date, 'dd/MM/yyyy');
+    } catch {
+      return 'N/A';
+    }
+  };
+
   const columns = [
     {
       header: 'Date',
       accessor: 'document_date',
       width: '12%',
-      render: (row) => format(new Date(row.document_date), 'dd/MM/yyyy'),
+      render: (row) => formatDocumentDate(row.document_date),
     },
     {
       header: 'Category',

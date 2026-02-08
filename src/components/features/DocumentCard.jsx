@@ -13,6 +13,18 @@ const DocumentCard = ({ document, onPreview, onDownload }) => {
     ? document.tags 
     : (document.tags?.split(',') || []);
 
+  // Safely format date
+  const formatDocumentDate = (dateStr) => {
+    if (!dateStr) return 'N/A';
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return 'N/A';
+      return format(date, 'dd/MM/yyyy');
+    } catch {
+      return 'N/A';
+    }
+  };
+
   return (
     <div className="document-card card border-0 shadow-sm mb-3">
       <div className="card-body">
@@ -22,7 +34,7 @@ const DocumentCard = ({ document, onPreview, onDownload }) => {
             <p className="text-muted small mb-0">{document.minor_head}</p>
           </div>
           <span className="badge bg-light text-dark">
-            {format(new Date(document.document_date), 'dd/MM/yyyy')}
+            {formatDocumentDate(document.document_date)}
           </span>
         </div>
 
