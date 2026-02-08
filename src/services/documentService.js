@@ -119,74 +119,77 @@ const documentService = {
   async searchDocuments(filters = {}) {
     try {
       const searchPayload = {
-        major_head: filters.major_head || '',
-        minor_head: filters.minor_head || '',
-        from_date: filters.from_date || '',
-        to_date: filters.to_date || '',
+        major_head: filters.major_head || "",
+        minor_head: filters.minor_head || "",
+        from_date: filters.from_date || "",
+        to_date: filters.to_date || "",
         tags: filters.tags || [],
-        uploaded_by: filters.uploaded_by || '',
+        uploaded_by: filters.uploaded_by || "",
         start: filters.start || 0,
         length: filters.length || 10,
-        filterId: filters.filterId || '',
+        filterId: filters.filterId || "",
         search: {
-          value: filters.search?.value || ''
-        }
+          value: filters.search?.value || "",
+        },
       };
-      
-      console.log('🔍 Searching documents with filters:', searchPayload);
-      
+
+      console.log("🔍 Searching documents with filters:", searchPayload);
+
       // Demo mode: Return mock documents if using test token
-      const token = localStorage.getItem('authToken') || '';
-      if (token.startsWith('test_token_')) {
-        console.log('📦 Demo Mode: Returning mock search results');
-        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate delay
-        
+      const token = localStorage.getItem("authToken") || "";
+      if (token.startsWith("test_token_")) {
+        console.log("📦 Demo Mode: Returning mock search results");
+        await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate delay
+
         const mockDocuments = [
           {
             id: 1,
-            major_head: 'Finance',
-            minor_head: 'Invoice',
-            document_date: '15-12-2024',
-            document_remarks: 'Q4 Invoice for vendor services',
-            tags: ['Invoice', '2024', 'Finance'],
-            uploaded_by: 'Test User',
-            uploaded_at: '2024-12-15T10:30:00Z',
-            file_name: 'invoice_q4_2024.pdf'
+            major_head: "Finance",
+            minor_head: "Invoice",
+            document_date: "15-12-2024",
+            document_remarks: "Q4 Invoice for vendor services",
+            tags: ["Invoice", "2024", "Finance"],
+            uploaded_by: "Test User",
+            uploaded_at: "2024-12-15T10:30:00Z",
+            file_name: "invoice_q4_2024.pdf",
           },
           {
             id: 2,
-            major_head: 'HR',
-            minor_head: 'Contract',
-            document_date: '01-11-2024',
-            document_remarks: 'Employment contract for new hire',
-            tags: ['Contract', 'HR', '2024'],
-            uploaded_by: 'Test User',
-            uploaded_at: '2024-11-01T09:15:00Z',
-            file_name: 'employee_contract.pdf'
+            major_head: "HR",
+            minor_head: "Contract",
+            document_date: "01-11-2024",
+            document_remarks: "Employment contract for new hire",
+            tags: ["Contract", "HR", "2024"],
+            uploaded_by: "Test User",
+            uploaded_at: "2024-11-01T09:15:00Z",
+            file_name: "employee_contract.pdf",
           },
           {
             id: 3,
-            major_head: 'Legal',
-            minor_head: 'Agreement',
-            document_date: '20-10-2024',
-            document_remarks: 'Vendor agreement renewal',
-            tags: ['Agreement', 'Legal', 'Important'],
-            uploaded_by: 'Test User',
-            uploaded_at: '2024-10-20T14:45:00Z',
-            file_name: 'vendor_agreement.pdf'
-          }
+            major_head: "Legal",
+            minor_head: "Agreement",
+            document_date: "20-10-2024",
+            document_remarks: "Vendor agreement renewal",
+            tags: ["Agreement", "Legal", "Important"],
+            uploaded_by: "Test User",
+            uploaded_at: "2024-10-20T14:45:00Z",
+            file_name: "vendor_agreement.pdf",
+          },
         ];
-        
+
         return {
           status: true,
           data: mockDocuments,
           recordsTotal: mockDocuments.length,
-          recordsFiltered: mockDocuments.length
+          recordsFiltered: mockDocuments.length,
         };
       }
-      
-      const response = await apiClient.post('/searchDocumentEntry', searchPayload);
-      console.log('✅ Search results:', response.data);
+
+      const response = await apiClient.post(
+        "/searchDocumentEntry",
+        searchPayload,
+      );
+      console.log("✅ Search results:", response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Search error:', error.response?.data || error.message);
