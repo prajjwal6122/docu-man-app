@@ -1,45 +1,59 @@
-import React from 'react';
-import './Toast.css';
+import React, { useEffect } from "react";
+import "./Toast.css";
 
 /**
  * Toast Notification Component
  * @param {string} type - Toast type: 'success', 'error', 'warning', 'info'
  * @param {string} message - Toast message
  * @param {function} onClose - Close handler
+ * @param {number} duration - Auto-dismiss duration in milliseconds
  */
-const Toast = ({ id, type, message, onClose }) => {
+const Toast = ({ id, type, message, onClose, duration = 3000 }) => {
+  useEffect(() => {
+    if (duration > 0) {
+      const timer = setTimeout(() => {
+        onClose(id);
+      }, duration);
+
+      return () => clearTimeout(timer);
+    }
+  }, [id, duration, onClose]);
+
   const getIcon = () => {
     switch (type) {
-      case 'success':
-        return '✓';
-      case 'error':
-        return '✕';
-      case 'warning':
-        return '⚠';
-      case 'info':
-        return 'ℹ';
+      case "success":
+        return "✓";
+      case "error":
+        return "✕";
+      case "warning":
+        return "⚠";
+      case "info":
+        return "ℹ";
       default:
-        return 'ℹ';
+        return "ℹ";
     }
   };
 
   const getBackgroundClass = () => {
     switch (type) {
-      case 'success':
-        return 'bg-success';
-      case 'error':
-        return 'bg-danger';
-      case 'warning':
-        return 'bg-warning';
-      case 'info':
-        return 'bg-info';
+      case "success":
+        return "bg-success";
+      case "error":
+        return "bg-danger";
+      case "warning":
+        return "bg-warning";
+      case "info":
+        return "bg-info";
       default:
-        return 'bg-primary';
+        return "bg-primary";
     }
   };
 
   return (
-    <div className={`toast show align-items-center text-white ${getBackgroundClass()} border-0`} role="alert">
+    <div
+      className={`toast show align-items-center text-white ${getBackgroundClass()} border-0`}
+      role="alert"
+    >
       <div className="d-flex">
         <div className="toast-body">
           <span className="me-2 fw-bold">{getIcon()}</span>
@@ -64,13 +78,17 @@ export const ToastContainer = ({ toasts, onClose }) => {
   if (!toasts || toasts.length === 0) return null;
 
   return (
-    <div className="toast-container position-fixed top-0 end-0 p-3" style={{ zIndex: 9999 }}>
+    <div
+      className="toast-container position-fixed top-0 end-0 p-3"
+      style={{ zIndex: 9999 }}
+    >
       {toasts.map((toast) => (
         <Toast
           key={toast.id}
           id={toast.id}
           type={toast.type}
           message={toast.message}
+          duration={toast.duration}
           onClose={onClose}
         />
       ))}

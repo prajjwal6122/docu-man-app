@@ -8,6 +8,14 @@ export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
 
   /**
+   * Remove a toast by ID
+   * @param {number} id - Toast ID
+   */
+  const removeToast = useCallback((id) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  }, []);
+
+  /**
    * Show a toast notification
    * @param {string} type - Toast type: 'success', 'error', 'warning', 'info'
    * @param {string} message - Toast message
@@ -24,22 +32,7 @@ export const ToastProvider = ({ children }) => {
 
     setToasts((prev) => [...prev, newToast]);
 
-    // Auto-remove toast after duration
-    if (duration > 0) {
-      setTimeout(() => {
-        removeToast(id);
-      }, duration);
-    }
-
     return id;
-  }, []);
-
-  /**
-   * Remove a toast by ID
-   * @param {number} id - Toast ID
-   */
-  const removeToast = useCallback((id) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
   /**
@@ -52,21 +45,33 @@ export const ToastProvider = ({ children }) => {
   /**
    * Convenience methods for different toast types
    */
-  const success = useCallback((message, duration) => {
-    return showToast('success', message, duration);
-  }, [showToast]);
+  const success = useCallback(
+    (message, duration) => {
+      return showToast("success", message, duration);
+    },
+    [showToast],
+  );
 
-  const error = useCallback((message, duration) => {
-    return showToast('error', message, duration);
-  }, [showToast]);
+  const error = useCallback(
+    (message, duration) => {
+      return showToast("error", message, duration);
+    },
+    [showToast],
+  );
 
-  const warning = useCallback((message, duration) => {
-    return showToast('warning', message, duration);
-  }, [showToast]);
+  const warning = useCallback(
+    (message, duration) => {
+      return showToast("warning", message, duration);
+    },
+    [showToast],
+  );
 
-  const info = useCallback((message, duration) => {
-    return showToast('info', message, duration);
-  }, [showToast]);
+  const info = useCallback(
+    (message, duration) => {
+      return showToast("info", message, duration);
+    },
+    [showToast],
+  );
 
   const value = {
     toasts,
@@ -80,10 +85,8 @@ export const ToastProvider = ({ children }) => {
   };
 
   return (
-    <ToastContext.Provider value={value}>
-      {children}
-    </ToastContext.Provider>
+    <ToastContext.Provider value={value}>{children}</ToastContext.Provider>
   );
-};
+};;
 
 export default ToastContext;

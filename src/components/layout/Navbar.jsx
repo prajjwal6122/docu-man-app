@@ -43,8 +43,11 @@ const Navbar = ({ onToggleSidebar }) => {
             <line x1="12" y1="8" x2="12.01" y2="8"></line>
           </svg>
           <strong>DEMO MODE</strong>
-          <span className="ms-2">
+          <span className="ms-2 d-none d-sm-inline">
             Using mock data for testing • Not connected to real backend
+          </span>
+          <span className="ms-2 d-sm-none">
+            Mock data only
           </span>
         </div>
       )}
@@ -79,10 +82,10 @@ const Navbar = ({ onToggleSidebar }) => {
 
           {/* User Info & Logout */}
           <div className="navbar-nav ms-auto d-flex align-items-center">
-            <div className="d-flex align-items-center gap-3">
+            <div className="d-flex align-items-center gap-2 gap-md-3">
               {/* User Info */}
               <div className="d-flex align-items-center gap-2">
-                <span className="badge bg-primary rounded-circle" style={{ width: '35px', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
+                <span className="badge bg-primary rounded-circle" style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
                   {(user?.name || "U")[0].toUpperCase()}
                 </span>
                 <div className="d-none d-md-block">
@@ -99,7 +102,7 @@ const Navbar = ({ onToggleSidebar }) => {
               
               {/* Logout Button */}
               <button 
-                className="btn btn-outline-danger btn-sm d-flex align-items-center gap-1"
+                className="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 navbar-logout-btn"
                 onClick={handleLogout}
                 title="Logout"
               >

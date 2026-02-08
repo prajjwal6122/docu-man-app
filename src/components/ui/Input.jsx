@@ -56,6 +56,10 @@ const Input = ({
         onBlur={onBlur}
         required={required}
         disabled={disabled}
+        style={{ 
+          backgroundColor: disabled ? "#e9ecef" : "#ffffff",
+          color: "#1E293B"
+        }}
         {...props}
       />
       {error && <div className="invalid-feedback d-block">{error}</div>}

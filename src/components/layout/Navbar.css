@@ -12,6 +12,33 @@
   padding: 0 var(--dms-spacing-md);
 }
 
+/* Mobile responsive adjustments */
+@media (max-width: 767.98px) {
+  .navbar {
+    height: 56px;
+  }
+  
+  .navbar .container-fluid {
+    padding: 0 0.75rem;
+  }
+  
+  .navbar-logout-btn {
+    padding: 0.375rem 0.5rem !important;
+    min-width: auto !important;
+  }
+  
+  .navbar-logout-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  
+  .badge.bg-primary.rounded-circle {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 13px !important;
+  }
+}
+
 .navbar .btn-link {
   color: var(--dms-text-secondary);
   transition: color 0.2s ease;
