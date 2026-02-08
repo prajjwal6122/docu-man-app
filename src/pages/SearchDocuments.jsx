@@ -113,21 +113,48 @@ const SearchDocuments = () => {
   };
 
   const handlePreview = (document) => {
+    // Check if in demo mode
+    const token = localStorage.getItem("authToken") || "";
+    const isDemo =
+      token.startsWith("test_token_") || import.meta.env.MODE === "development";
+
+    if (isDemo) {
+      toast.error(
+        "Preview feature is not available. Backend/Database not integrated in demo mode.",
+      );
+      return;
+    }
+
     setSelectedDocument(document);
     setShowPreview(true);
   };
 
   const handleDownload = async (document) => {
+    // Check if in demo mode
+    const token = localStorage.getItem("authToken") || "";
+    const isDemo =
+      token.startsWith("test_token_") || import.meta.env.MODE === "development";
+
+    if (isDemo) {
+      toast.error(
+        "Download feature is not available. Backend/Database not integrated in demo mode.",
+      );
+      return;
+    }
+
     try {
-      toast.info('Downloading file...');
-      const blob = await documentService.downloadDocument(document.id || document.document_id);
-      const filename = document.file_name || document.document_name || 'document.pdf';
+      toast.info("Downloading file...");
+      const blob = await documentService.downloadDocument(
+        document.id || document.document_id,
+      );
+      const filename =
+        document.file_name || document.document_name || "document.pdf";
       downloadFile(blob, filename);
-      toast.success('File downloaded successfully');
+      toast.success("File downloaded successfully");
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
-        'Failed to download file. Please try again.';
+        "Failed to download file. Please try again.";
       toast.error(errorMessage);
     }
   };
