@@ -9,17 +9,12 @@ const documentService = {
    */
   async getTags(term = '') {
     try {
-      console.log('🏷️ Fetching tags with term:', term);
       const response = await apiClient.post('/documentTags', { term });
-      console.log('✅ Tags received:', response.data);
       return response.data;
     } catch (error) {
-      console.error('❌ Tags error:', error.response?.data || error.message);
-      
       // Demo mode: Return mock tags if using test token
       const token = localStorage.getItem('authToken') || '';
       if (token.startsWith('test_token_')) {
-        console.log('📦 Demo Mode: Returning mock tags');
         return {
           status: true,
           tags: [
@@ -33,6 +28,7 @@ const documentService = {
         };
       }
       
+      console.error('Tags error:', error.response?.data || error.message);
       throw error;
     }
   },
@@ -66,17 +62,9 @@ const documentService = {
       
       formData.append('data', JSON.stringify(data));
       
-      console.log('📤 Uploading document:', {
-        major_head: data.major_head,
-        minor_head: data.minor_head,
-        tags: data.tags,
-        user_id: data.user_id
-      });
-      
       // Demo mode: Return mock success if using test token
       const token = localStorage.getItem('authToken') || '';
       if (token.startsWith('test_token_')) {
-        console.log('📦 Demo Mode: Simulating document upload');
         await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
         return {
           status: true,
@@ -93,10 +81,9 @@ const documentService = {
       // The interceptor will add the token header automatically
       const response = await apiClient.post('/saveDocumentEntry', formData);
       
-      console.log('✅ Upload response:', response.data);
       return response.data;
     } catch (error) {
-      console.error('❌ Upload error:', error.response?.data || error.message);
+      console.error('Upload error:', error.response?.data || error.message);
       throw error;
     }
   },
@@ -133,12 +120,9 @@ const documentService = {
         },
       };
 
-      console.log("🔍 Searching documents with filters:", searchPayload);
-
       // Demo mode: Return mock documents if using test token
       const token = localStorage.getItem("authToken") || "";
       if (token.startsWith("test_token_")) {
-        console.log("📦 Demo Mode: Returning mock search results");
         await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate delay
 
         const mockDocuments = [
@@ -189,10 +173,9 @@ const documentService = {
         "/searchDocumentEntry",
         searchPayload,
       );
-      console.log("✅ Search results:", response.data);
       return response.data;
     } catch (error) {
-      console.error('❌ Search error:', error.response?.data || error.message);
+      console.error('Search error:', error.response?.data || error.message);
       throw error;
     }
   },
