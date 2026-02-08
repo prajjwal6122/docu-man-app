@@ -41,16 +41,25 @@ const UploadDocument = () => {
     setLoading(true);
 
     try {
+      // Format date as DD-MM-YYYY (API expects this format)
+      const date = new Date(formData.documentDate);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const formattedDate = `${day}-${month}-${year}`;
+      
       // Transform form data to match API expectations
       const documentData = {
         file: formData.file,
         major_head: formData.majorHead,
         minor_head: formData.minorHead,
-        document_date: formData.documentDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+        document_date: formattedDate, // Format as DD-MM-YYYY
         document_remarks: formData.remarks,
         tags: formData.tags.map(tag => ({ tag_name: tag })), // Convert tags to array of objects
         user_id: user?.mobile || user?.id || 'unknown' // Use mobile number or user ID
       };
+      
+      console.log('📋 Upload form data:', documentData);
 
       const response = await documentService.uploadDocument(documentData);
 
@@ -63,8 +72,10 @@ const UploadDocument = () => {
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
+        error.response?.data?.data ||
         "Failed to upload document. Please try again.";
       toast.error(errorMessage);
+      console.error('Upload error details:', error);
       throw error;
     } finally {
       setLoading(false);

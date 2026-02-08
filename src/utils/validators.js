@@ -113,6 +113,16 @@ export const validators = {
 };
 
 /**
+ * Validate required field (named export for convenience)
+ */
+export const validateRequired = (value, fieldName = 'This field') => {
+  if (!value || (typeof value === 'string' && !value.trim())) {
+    return `${fieldName} is required`;
+  }
+  return '';
+};
+
+/**
  * Validate username (4-20 characters, alphanumeric and underscore)
  */
 export const validateUsername = (value) => {

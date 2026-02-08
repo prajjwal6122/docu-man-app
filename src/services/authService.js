@@ -40,6 +40,12 @@ const authService = {
   saveAuth(token, userData) {
     setCookie('authToken', token, 7); // Store for 7 days
     setCookie('user', JSON.stringify(userData), 7);
+    
+    // Also store in localStorage as fallback for development
+    localStorage.setItem('authToken', token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    
+    console.log('Auth saved:', { token: token.substring(0, 20) + '...', user: userData });
   },
 
   /**
@@ -66,7 +72,10 @@ const authService = {
    * @returns {string|null}
    */
   getToken() {
-    return getCookie('authToken');
+    const cookieToken = getCookie('authToken');
+    // Fallback to localStorage in development
+    const token = cookieToken || localStorage.getItem('authToken');
+    return token;
   },
 
   /**
@@ -74,13 +83,15 @@ const authService = {
    * @returns {object|null}
    */
   getUser() {
-    const userStr = getCookie('user');
+    const cookieUserStr = getCookie('user');
+    // Fallback to localStorage in development
+    const userStr = cookieUserStr || localStorage.getItem('user');
     if (!userStr) return null;
     
     try {
       return JSON.parse(userStr);
     } catch (error) {
-      console.error('Error parsing user data from cookie:', error);
+      console.error("Error parsing user data:", error);
       return null;
     }
   }

@@ -16,10 +16,10 @@ const IS_DEVELOPMENT = import.meta.env.DEV;
  * Handles OTP-based authentication
  */
 const LoginPage = () => {
-  const [step, setStep] = useState('mobile'); // 'mobile' or 'otp'
-  const [mobileNumber, setMobileNumber] = useState('');
+  const [step, setStep] = useState("mobile"); // 'mobile' or 'otp'
+  const [mobileNumber, setMobileNumber] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   const { login } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
@@ -28,59 +28,63 @@ const LoginPage = () => {
   const handleSendOTP = async (mobile) => {
     setLoading(true);
     setMobileNumber(mobile);
-    
+
     try {
       // Check if using master mobile for frontend testing (development only)
       if (IS_DEVELOPMENT && mobile === MASTER_MOBILE) {
-        toast.success('Test mode: OTP is 123456');
-        setStep('otp');
+        toast.success("Test mode: OTP is 123456");
+        setStep("otp");
         setLoading(false);
         return;
       }
-      
+
       // Call API to send OTP (works for both new and existing users)
       const response = await authService.generateOTP(mobile);
-      console.log('OTP Response:', response);
-      
+      console.log("OTP Response:", response);
+
       // Check if OTP was sent successfully
       // For new users, the API might return status: false with message about not registered
       // We'll still proceed to OTP step as the OTP serves as registration
       if (response.status === false && response.data) {
         const message = response.data.toLowerCase();
         // If message indicates user is not registered, treat it as new user registration
-        if (message.includes('not') && message.includes('registered')) {
-          toast.info('New user detected. An OTP will be sent for registration.');
+        if (message.includes("not") && message.includes("registered")) {
+          toast.info(
+            "New user detected. An OTP will be sent for registration.",
+          );
           // Still proceed to OTP step for new user registration
-          setStep('otp');
+          setStep("otp");
           return;
         }
         // For other errors, show error message
-        toast.error(response.data || 'Failed to send OTP');
+        toast.error(response.data || "Failed to send OTP");
         return;
       }
-      
-      toast.success('OTP sent successfully to ' + mobile);
-      setStep('otp');
+
+      toast.success("OTP sent successfully to " + mobile);
+      setStep("otp");
     } catch (error) {
-      console.error('OTP Error:', error);
-      console.error('Error Response:', error.response?.data);
-      
+      console.error("OTP Error:", error);
+      console.error("Error Response:", error.response?.data);
+
       // Handle different error response formats
       const errorData = error.response?.data;
-      
+
       // Check if it's a "not registered" case
-      if (errorData && errorData.data && typeof errorData.data === 'string') {
+      if (errorData && errorData.data && typeof errorData.data === "string") {
         const message = errorData.data.toLowerCase();
-        if (message.includes('not') && message.includes('registered')) {
-          toast.info('New user detected. An OTP will be sent for registration.');
-          setStep('otp');
+        if (message.includes("not") && message.includes("registered")) {
+          toast.info(
+            "New user detected. An OTP will be sent for registration.",
+          );
+          setStep("otp");
           return;
         }
       }
-      
-      let errorMessage = 'Failed to send OTP. Please try again.';
+
+      let errorMessage = "Failed to send OTP. Please try again.";
       if (errorData) {
-        if (errorData.data && typeof errorData.data === 'string') {
+        if (errorData.data && typeof errorData.data === "string") {
           errorMessage = errorData.data;
         } else if (errorData.message) {
           errorMessage = errorData.message;
@@ -88,7 +92,7 @@ const LoginPage = () => {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -98,55 +102,59 @@ const LoginPage = () => {
   // Handle OTP verification and login
   const handleVerifyOTP = async (otp) => {
     setLoading(true);
-    
+
     try {
       // Check if using master credentials for frontend testing (development only)
-      if (IS_DEVELOPMENT && mobileNumber === MASTER_MOBILE && otp === MASTER_OTP) {
+      if (
+        IS_DEVELOPMENT &&
+        mobileNumber === MASTER_MOBILE &&
+        otp === MASTER_OTP
+      ) {
         // Mock successful login for testing
-        const mockToken = 'test_token_' + Date.now();
+        const mockToken = "test_token_" + Date.now();
         const mockUser = {
           mobile: mobileNumber,
-          name: 'Test User',
-          id: 'test_user_001'
+          name: "Test User",
+          id: "test_user_001",
         };
-        
+
         login(mockToken, mockUser);
-        toast.success('Login successful! (Test Mode)');
-        navigate('/dashboard', { replace: true });
+        toast.success("Login successful! (Test Mode)");
+        navigate("/dashboard", { replace: true });
         setLoading(false);
         return;
       }
-      
+
       // Validate OTP and get auth token
       const response = await authService.validateOTP(mobileNumber, otp);
-      console.log('Validate OTP Response:', response);
-      
+      console.log("Validate OTP Response:", response);
+
       // Check if response indicates failure
       if (response.status === false) {
-        toast.error(response.data || response.message || 'Invalid OTP');
+        toast.error(response.data || response.message || "Invalid OTP");
         return;
       }
-      
+
       // Store token and user data
       if (response.token) {
         login(response.token, response.user || { mobile: mobileNumber });
-        toast.success('Login successful!');
-        
+        toast.success("Login successful!");
+
         // Redirect to dashboard
-        navigate('/dashboard', { replace: true });
+        navigate("/dashboard", { replace: true });
       } else {
-        throw new Error('Invalid response from server');
+        throw new Error("Invalid response from server");
       }
     } catch (error) {
-      console.error('Verify OTP Error:', error);
-      console.error('Error Response:', error.response?.data);
-      
+      console.error("Verify OTP Error:", error);
+      console.error("Error Response:", error.response?.data);
+
       // Handle different error response formats
       const errorData = error.response?.data;
-      let errorMessage = 'Invalid OTP. Please try again.';
-      
+      let errorMessage = "Invalid OTP. Please try again.";
+
       if (errorData) {
-        if (errorData.data && typeof errorData.data === 'string') {
+        if (errorData.data && typeof errorData.data === "string") {
           errorMessage = errorData.data;
         } else if (errorData.message) {
           errorMessage = errorData.message;
@@ -154,7 +162,7 @@ const LoginPage = () => {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -163,8 +171,8 @@ const LoginPage = () => {
 
   // Handle back to mobile number step
   const handleBackToMobile = () => {
-    setStep('mobile');
-    setMobileNumber('');
+    setStep("mobile");
+    setMobileNumber("");
   };
 
   return (
@@ -178,7 +186,7 @@ const LoginPage = () => {
                 <div className="text-center mb-4">
                   <h2 className="text-primary fw-bold mb-2">Docu-Man</h2>
                   <p className="text-muted">Document Management System</p>
-                  {step === 'mobile' && (
+                  {step === "mobile" && (
                     <small className="text-muted d-block mt-2">
                       Login or Register with OTP
                     </small>
@@ -190,29 +198,29 @@ const LoginPage = () => {
                   <div className="d-flex align-items-center">
                     <div
                       className={`rounded-circle d-flex align-items-center justify-content-center ${
-                        step === 'mobile'
-                          ? 'bg-primary text-white'
-                          : 'bg-success text-white'
+                        step === "mobile"
+                          ? "bg-primary text-white"
+                          : "bg-success text-white"
                       }`}
-                      style={{ width: '32px', height: '32px' }}
+                      style={{ width: "32px", height: "32px" }}
                     >
-                      {step === 'mobile' ? '1' : '✓'}
+                      {step === "mobile" ? "1" : "✓"}
                     </div>
                     <div
                       className="mx-2"
                       style={{
-                        width: '60px',
-                        height: '2px',
-                        background: step === 'otp' ? '#198754' : '#dee2e6',
+                        width: "60px",
+                        height: "2px",
+                        background: step === "otp" ? "#198754" : "#dee2e6",
                       }}
                     ></div>
                     <div
                       className={`rounded-circle d-flex align-items-center justify-content-center ${
-                        step === 'otp'
-                          ? 'bg-primary text-white'
-                          : 'bg-secondary text-white'
+                        step === "otp"
+                          ? "bg-primary text-white"
+                          : "bg-secondary text-white"
                       }`}
-                      style={{ width: '32px', height: '32px' }}
+                      style={{ width: "32px", height: "32px" }}
                     >
                       2
                     </div>
@@ -220,7 +228,7 @@ const LoginPage = () => {
                 </div>
 
                 {/* Forms */}
-                {step === 'mobile' ? (
+                {step === "mobile" ? (
                   <MobileNumberForm
                     onSubmit={handleSendOTP}
                     loading={loading}
@@ -239,29 +247,48 @@ const LoginPage = () => {
                 {IS_DEVELOPMENT && (
                   <div className="text-center mt-3">
                     <small className="text-success d-block">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="me-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        className="me-1"
+                      >
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
-                      Test Mode: Use mobile <strong>9999999999</strong> with OTP <strong>123456</strong>
+                      Test Mode: Use mobile <strong>9999999999</strong> with OTP{" "}
+                      <strong>123456</strong>
                     </small>
                   </div>
                 )}
-                    
 
                 {/* Footer */}
                 <div className="text-center mt-4">
                   <small className="text-muted">
                     Secure OTP-based authentication
                   </small>
-                  {step === 'mobile' && (
+                  {step === "mobile" && (
                     <div className="mt-3">
                       <small className="text-info d-block">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="me-1">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="me-1"
+                        >
                           <circle cx="12" cy="12" r="10"></circle>
                           <line x1="12" y1="16" x2="12" y2="12"></line>
                           <line x1="12" y1="8" x2="12.01" y2="8"></line>
                         </svg>
-                        Enter your mobile number to receive an OTP for login or registration.
+                        Enter your mobile number to receive an OTP for login or
+                        registration.
                       </small>
                     </div>
                   )}

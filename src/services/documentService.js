@@ -9,9 +9,12 @@ const documentService = {
    */
   async getTags(term = '') {
     try {
+      console.log('🏷️ Fetching tags with term:', term);
       const response = await apiClient.post('/documentTags', { term });
+      console.log('✅ Tags received:', response.data);
       return response.data;
     } catch (error) {
+      console.error('❌ Tags error:', error.response?.data || error.message);
       throw error;
     }
   },
@@ -45,13 +48,21 @@ const documentService = {
       
       formData.append('data', JSON.stringify(data));
       
-      const response = await apiClient.post('/saveDocumentEntry', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      console.log('📤 Uploading document:', {
+        major_head: data.major_head,
+        minor_head: data.minor_head,
+        tags: data.tags,
+        user_id: data.user_id
       });
+      
+      // Don't manually set Content-Type - axios will set it with boundary for FormData
+      // The interceptor will add the token header automatically
+      const response = await apiClient.post('/saveDocumentEntry', formData);
+      
+      console.log('✅ Upload response:', response.data);
       return response.data;
     } catch (error) {
+      console.error('❌ Upload error:', error.response?.data || error.message);
       throw error;
     }
   },
@@ -88,9 +99,12 @@ const documentService = {
         }
       };
       
+      console.log('🔍 Searching documents with filters:', searchPayload);
       const response = await apiClient.post('/searchDocumentEntry', searchPayload);
+      console.log('✅ Search results:', response.data);
       return response.data;
     } catch (error) {
+      console.error('❌ Search error:', error.response?.data || error.message);
       throw error;
     }
   },

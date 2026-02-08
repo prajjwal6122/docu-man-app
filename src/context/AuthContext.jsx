@@ -14,6 +14,12 @@ export const AuthProvider = ({ children }) => {
     const storedToken = authService.getToken();
     const storedUser = authService.getUser();
     
+    console.log("Auth initialization:", {
+      hasToken: !!storedToken,
+      hasUser: !!storedUser,
+      user: storedUser,
+    });
+    
     if (storedToken && storedUser) {
       setToken(storedToken);
       setUser(storedUser);
