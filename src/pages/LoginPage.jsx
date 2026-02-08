@@ -7,9 +7,11 @@ import useToast from '../hooks/useToast';
 import authService from '../services/authService';
 
 // Master credentials for frontend testing (development only)
+// DEMO MODE: Mocks all API responses for testing without backend
 const MASTER_MOBILE = '9999999999';
 const MASTER_OTP = '123456';
 const IS_DEVELOPMENT = import.meta.env.DEV;
+const ENABLE_TEST_MODE = true; // Enables demo mode with mocked API responses
 
 /**
  * Login Page Component
@@ -31,57 +33,104 @@ const LoginPage = () => {
 
     try {
       // Check if using master mobile for frontend testing (development only)
-      if (IS_DEVELOPMENT && mobile === MASTER_MOBILE) {
+      if (IS_DEVELOPMENT && ENABLE_TEST_MODE && mobile === MASTER_MOBILE) {
+        console.log("✅ Test mode activated for mobile:", mobile);
+        console.warn("⚠️ Test mode: Mock token won't work with real API!");
         toast.success("Test mode: OTP is 123456");
         setStep("otp");
         setLoading(false);
         return;
       }
 
+      console.log("📤 Sending OTP request for mobile:", mobile);
+      
       // Call API to send OTP (works for both new and existing users)
       const response = await authService.generateOTP(mobile);
-      console.log("OTP Response:", response);
+      console.log("📥 OTP API Response:", response);
 
-      // Check if OTP was sent successfully
-      // For new users, the API might return status: false with message about not registered
-      // We'll still proceed to OTP step as the OTP serves as registration
+      // SUCCESS: Check if response indicates OTP was sent
+      if (response.status === true || response.success === true) {
+        const message = response.data || response.message || "OTP sent successfully";
+        console.log("✅ OTP sent successfully:", message);
+        toast.success(message + " to " + mobile);
+        setStep("otp");
+        return;
+      }
+
+      // SPECIAL CASE: User not registered
       if (response.status === false && response.data) {
-        const message = response.data.toLowerCase();
-        // If message indicates user is not registered, treat it as new user registration
-        if (message.includes("not") && message.includes("registered")) {
-          toast.info(
-            "New user detected. An OTP will be sent for registration.",
-          );
-          // Still proceed to OTP step for new user registration
+        const message = String(response.data).toLowerCase();
+        console.log("⚠️ API returned status false with message:", response.data);
+        
+        // If user is not registered - backend doesn't send OTP for unregistered users
+        if (message.includes("not") && (message.includes("register") || message.includes("exist"))) {
+          console.error("❌ User not registered - OTP not sent");
+          toast.error(response.data);
+          toast.info("Please contact admin to register your mobile number first.", { duration: 5000 });
+          return;
+        }
+        
+        // If OTP was actually sent despite status false
+        if (message.includes("otp") && message.includes("sent")) {
+          console.log("✅ OTP sent (status false but message says sent)");
+          toast.success(response.data);
           setStep("otp");
           return;
         }
-        // For other errors, show error message
+        
+        // Other errors with status false
+        console.error("❌ API error:", response.data);
         toast.error(response.data || "Failed to send OTP");
         return;
       }
 
-      toast.success("OTP sent successfully to " + mobile);
-      setStep("otp");
+      // UNCLEAR RESPONSE: If we reach here, API response is unclear
+      console.warn("⚠️ Unclear API response:", response);
+      toast.error("Unexpected response from server. Please try again.");
+
     } catch (error) {
-      console.error("OTP Error:", error);
+      console.error("❌ OTP Generation Error:", error);
       console.error("Error Response:", error.response?.data);
+      console.error("Error Status:", error.response?.status);
 
-      // Handle different error response formats
+      // Handle network/connection errors
+      if (!error.response) {
+        console.error("❌ Network error - no response from server");
+        toast.error("Network error. Please check your connection and try again.");
+        return;
+      }
+
       const errorData = error.response?.data;
+      const errorStatus = error.response?.status;
 
-      // Check if it's a "not registered" case
+      // 404: Endpoint not found
+      if (errorStatus === 404) {
+        console.error("❌ API endpoint not found");
+        toast.error("API endpoint not found. Please contact support.");
+        return;
+      }
+
+      // Handle "not registered" error - backend doesn't send OTP for unregistered users
       if (errorData && errorData.data && typeof errorData.data === "string") {
-        const message = errorData.data.toLowerCase();
-        if (message.includes("not") && message.includes("registered")) {
-          toast.info(
-            "New user detected. An OTP will be sent for registration.",
-          );
+        const message = String(errorData.data).toLowerCase();
+        
+        if (message.includes("not") && (message.includes("register") || message.includes("exist"))) {
+          console.error("❌ User not registered - OTP not sent");
+          toast.error(errorData.data);
+          toast.info("Please contact admin to register your mobile number first.", { duration: 5000 });
+          return;
+        }
+        
+        // If error message mentions OTP was sent anyway
+        if (message.includes("otp") && message.includes("sent")) {
+          console.log("✅ OTP sent (from error response)");
+          toast.success(errorData.data);
           setStep("otp");
           return;
         }
       }
 
+      // Extract error message
       let errorMessage = "Failed to send OTP. Please try again.";
       if (errorData) {
         if (errorData.data && typeof errorData.data === "string") {
@@ -93,6 +142,7 @@ const LoginPage = () => {
         errorMessage = error.message;
       }
 
+      console.error("❌ Final error message:", errorMessage);
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -107,47 +157,75 @@ const LoginPage = () => {
       // Check if using master credentials for frontend testing (development only)
       if (
         IS_DEVELOPMENT &&
+        ENABLE_TEST_MODE &&
         mobileNumber === MASTER_MOBILE &&
         otp === MASTER_OTP
       ) {
+        console.log("✅ Test mode login activated");
+        console.warn("⚠️ WARNING: Mock token won't work with real API endpoints!");
+        console.warn("⚠️ Use a real mobile number to test API functionality");
         // Mock successful login for testing
         const mockToken = "test_token_" + Date.now();
         const mockUser = {
           mobile: mobileNumber,
           name: "Test User",
           id: "test_user_001",
+          role: "user"
         };
 
         login(mockToken, mockUser);
-        toast.success("Login successful! (Test Mode)");
+        toast.success("Login successful! Welcome to Demo Mode");
+        toast.info("Demo Mode: Using mocked data for testing", { duration: 4000 });
         navigate("/dashboard", { replace: true });
         setLoading(false);
         return;
       }
 
+      console.log("🔐 Validating OTP for mobile:", mobileNumber);
+      
       // Validate OTP and get auth token
       const response = await authService.validateOTP(mobileNumber, otp);
-      console.log("Validate OTP Response:", response);
+      console.log("📥 Validate OTP Response:", response);
 
-      // Check if response indicates failure
-      if (response.status === false) {
-        toast.error(response.data || response.message || "Invalid OTP");
+      // SUCCESS: Check if we got a token (most important)
+      if (response.token) {
+        console.log("✅ Token received, logging in user");
+        const userData = response.user || response.data?.user || { mobile: mobileNumber };
+        login(response.token, userData);
+        toast.success("Login successful!");
+        navigate("/dashboard", { replace: true });
         return;
       }
 
-      // Store token and user data
-      if (response.token) {
-        login(response.token, response.user || { mobile: mobileNumber });
-        toast.success("Login successful!");
-
-        // Redirect to dashboard
-        navigate("/dashboard", { replace: true });
-      } else {
-        throw new Error("Invalid response from server");
+      // SUCCESS with different format: Check status true
+      if (response.status === true && response.data) {
+        // Sometimes token might be nested in data
+        if (response.data.token) {
+          console.log("✅ Token received in data object");
+          const userData = response.data.user || { mobile: mobileNumber };
+          login(response.data.token, userData);
+          toast.success("Login successful!");
+          navigate("/dashboard", { replace: true });
+          return;
+        }
       }
+
+      // FAILURE: Check if response indicates failure
+      if (response.status === false) {
+        const errorMsg = response.data || response.message || "Invalid OTP";
+        console.error("❌ OTP validation failed:", errorMsg);
+        toast.error(errorMsg);
+        return;
+      }
+
+      // UNCLEAR: If we got here, response format is unexpected
+      console.error("❌ Unexpected response format:", response);
+      toast.error("Invalid response from server. Please try again.");
+
     } catch (error) {
-      console.error("Verify OTP Error:", error);
+      console.error("❌ Verify OTP Error:", error);
       console.error("Error Response:", error.response?.data);
+      console.error("Error Status:", error.response?.status);
 
       // Handle different error response formats
       const errorData = error.response?.data;
@@ -244,9 +322,40 @@ const LoginPage = () => {
                 )}
 
                 {/* Test Mode Info - Only in Development */}
-                {IS_DEVELOPMENT && (
+                {IS_DEVELOPMENT && ENABLE_TEST_MODE && (
                   <div className="text-center mt-3">
-                    <small className="text-success d-block">
+                    <div className="alert alert-info mb-0" role="alert">
+                      <h6 className="alert-heading mb-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="me-2"
+                          style={{ verticalAlign: 'text-bottom' }}
+                        >
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="16" x2="12" y2="12"></line>
+                          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        Demo Mode Credentials
+                      </h6>
+                      <p className="mb-2">
+                        <strong>Mobile:</strong> 9999999999<br/>
+                        <strong>OTP:</strong> 123456
+                      </p>
+                      <small className="text-muted">
+                        Uses mock data for testing • Full UI functionality enabled
+                      </small>
+                    </div>
+                  </div>
+                )}
+                {IS_DEVELOPMENT && !ENABLE_TEST_MODE && (
+                  <div className="text-center mt-3">
+                    <small className="text-info d-block">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="14"
@@ -257,10 +366,11 @@ const LoginPage = () => {
                         strokeWidth="2"
                         className="me-1"
                       >
-                        <polyline points="20 6 9 17 4 12"></polyline>
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
                       </svg>
-                      Test Mode: Use mobile <strong>9999999999</strong> with OTP{" "}
-                      <strong>123456</strong>
+                      Development Mode: Use real mobile number to test API
                     </small>
                   </div>
                 )}
