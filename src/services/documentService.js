@@ -15,6 +15,24 @@ const documentService = {
       return response.data;
     } catch (error) {
       console.error('❌ Tags error:', error.response?.data || error.message);
+      
+      // Demo mode: Return mock tags if using test token
+      const token = localStorage.getItem('authToken') || '';
+      if (token.startsWith('test_token_')) {
+        console.log('📦 Demo Mode: Returning mock tags');
+        return {
+          status: true,
+          tags: [
+            { tag_name: 'Invoice' },
+            { tag_name: 'Contract' },
+            { tag_name: '2024' },
+            { tag_name: 'Important' },
+            { tag_name: 'Finance' },
+            { tag_name: 'HR' }
+          ]
+        };
+      }
+      
       throw error;
     }
   },
@@ -54,6 +72,22 @@ const documentService = {
         tags: data.tags,
         user_id: data.user_id
       });
+      
+      // Demo mode: Return mock success if using test token
+      const token = localStorage.getItem('authToken') || '';
+      if (token.startsWith('test_token_')) {
+        console.log('📦 Demo Mode: Simulating document upload');
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
+        return {
+          status: true,
+          message: 'Document uploaded successfully',
+          data: {
+            document_id: 'DOC' + Date.now(),
+            file_name: documentData.file.name,
+            uploaded_at: new Date().toISOString()
+          }
+        };
+      }
       
       // Don't manually set Content-Type - axios will set it with boundary for FormData
       // The interceptor will add the token header automatically
@@ -100,6 +134,57 @@ const documentService = {
       };
       
       console.log('🔍 Searching documents with filters:', searchPayload);
+      
+      // Demo mode: Return mock documents if using test token
+      const token = localStorage.getItem('authToken') || '';
+      if (token.startsWith('test_token_')) {
+        console.log('📦 Demo Mode: Returning mock search results');
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate delay
+        
+        const mockDocuments = [
+          {
+            id: 1,
+            major_head: 'Finance',
+            minor_head: 'Invoice',
+            document_date: '15-12-2024',
+            document_remarks: 'Q4 Invoice for vendor services',
+            tags: ['Invoice', '2024', 'Finance'],
+            uploaded_by: 'Test User',
+            uploaded_at: '2024-12-15T10:30:00Z',
+            file_name: 'invoice_q4_2024.pdf'
+          },
+          {
+            id: 2,
+            major_head: 'HR',
+            minor_head: 'Contract',
+            document_date: '01-11-2024',
+            document_remarks: 'Employment contract for new hire',
+            tags: ['Contract', 'HR', '2024'],
+            uploaded_by: 'Test User',
+            uploaded_at: '2024-11-01T09:15:00Z',
+            file_name: 'employee_contract.pdf'
+          },
+          {
+            id: 3,
+            major_head: 'Legal',
+            minor_head: 'Agreement',
+            document_date: '20-10-2024',
+            document_remarks: 'Vendor agreement renewal',
+            tags: ['Agreement', 'Legal', 'Important'],
+            uploaded_by: 'Test User',
+            uploaded_at: '2024-10-20T14:45:00Z',
+            file_name: 'vendor_agreement.pdf'
+          }
+        ];
+        
+        return {
+          status: true,
+          data: mockDocuments,
+          recordsTotal: mockDocuments.length,
+          recordsFiltered: mockDocuments.length
+        };
+      }
+      
       const response = await apiClient.post('/searchDocumentEntry', searchPayload);
       console.log('✅ Search results:', response.data);
       return response.data;

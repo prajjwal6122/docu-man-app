@@ -48,13 +48,30 @@ apiClient.interceptors.response.use(
       });
       
       if (status === 401) {
-        console.error('🚫 UNAUTHORIZED - Clearing auth and redirecting to login');
-        // Unauthorized - clear cookies and redirect to login
-        clearAuthCookies();
-        // Also clear localStorage as fallback
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
-        window.location.href = '/login';
+        // Don't redirect on auth endpoints - they handle their own errors
+        const isAuthEndpoint = error.config?.url?.includes('generateOTP') || 
+                              error.config?.url?.includes('validateOTP');
+        
+        // Don't redirect if using demo mode test token
+        const token = error.config?.headers?.token || '';
+        const isDemoMode = token.startsWith('test_token_');
+        
+        if (!isAuthEndpoint && !isDemoMode) {
+          console.error('🚫 UNAUTHORIZED - Token invalid or expired');
+          console.error('Token used:', error.config?.headers?.token?.substring(0, 20) + '...');
+          
+          // Clear auth and redirect after a short delay to show the message
+          setTimeout(() => {
+            clearAuthCookies();
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+          }, 100);
+        } else if (isDemoMode) {
+          console.log('📦 Demo Mode: Ignoring 401 error (using mock data)');
+        } else {
+          console.log('Auth endpoint error - let component handle it');
+        }
       } else if (status === 500) {
         console.error('Server error:', data);
       }
@@ -68,6 +85,6 @@ apiClient.interceptors.response.use(
     
     return Promise.reject(error);
   }
-);
+);;
 
 export default apiClient;
