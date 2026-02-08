@@ -5,7 +5,7 @@ A modern, responsive document management system built with React and Bootstrap. 
 ## 🚀 Features
 
 ### Core Functionality
-- **Authentication**: OTP-based mobile number authentication
+- **Authentication**: OTP-based mobile number authentication with cookie storage
 - **Document Upload**: Upload documents with metadata (category, subcategory, tags, date, remarks)
 - **Advanced Search**: Search documents by category, subcategory, tags, and date range
 - **Document Preview**: In-browser preview for PDF and image files
@@ -14,6 +14,8 @@ A modern, responsive document management system built with React and Bootstrap. 
 
 ### Technical Features
 - **Responsive Design**: Mobile-first design that works on all devices (375px+)
+- **Cookie-Based Auth**: Secure token storage using cookies with Secure and SameSite flags
+- **Production Ready**: Environment-specific configurations for development and production
 - **Error Boundaries**: Comprehensive error handling to prevent app crashes
   - App-level error boundary catches all errors
   - Page-level error boundaries isolate errors to individual pages
@@ -28,6 +30,7 @@ A modern, responsive document management system built with React and Bootstrap. 
 - **Tag Autocomplete**: Smart tag input with existing tag suggestions
 - **File Upload**: Drag-and-drop file upload with preview
 - **Axios Interceptors**: Automatic token injection and error handling
+- **Code Splitting**: Optimized bundle sizes with vendor chunk splitting
 
 ## 📋 Prerequisites
 
@@ -61,19 +64,20 @@ This will install all required dependencies including:
 
 ### 3. Environment Configuration
 
-Create a `.env` file in the root directory:
+The application comes with pre-configured environment files:
 
-```bash
-cp .env.example .env
-```
+- `.env.development` - Development environment
+- `.env.production` - Production environment  
 
-Update the `.env` file with your backend API URL:
+**Production API URL**: `https://apis.allsoft.co/api/documentManagement`
+
+For custom configurations, create a `.env` file:
 
 ```env
-VITE_API_BASE_URL=http://localhost:5000/api
+VITE_API_BASE_URL=https://apis.allsoft.co/api/documentManagement
 ```
 
-**Important**: The backend API should be running and accessible at the specified URL.
+**Important**: The API endpoints are already configured to work with the production backend.
 
 ## 🚦 Running the Application
 
@@ -87,6 +91,10 @@ npm run dev
 
 The application will open at `http://localhost:3000`
 
+**Test Credentials (Development Only)**:
+- Mobile: `9999999999`
+- OTP: `123456`
+
 ### Production Build
 
 Build the application for production:
@@ -95,11 +103,27 @@ Build the application for production:
 npm run build
 ```
 
+This creates an optimized build in the `dist` folder with:
+- Minified code
+- Code splitting (React vendor and UI vendor bundles)
+- No source maps
+- Optimized assets
+
 Preview the production build:
 
 ```bash
 npm run preview
 ```
+
+**Note**: Test credentials are disabled in production. You need real OTP from the backend.
+
+### Deployment
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions including:
+- Netlify/Vercel deployment
+- Traditional web server setup
+- Docker deployment
+- Security considerations
 
 ## 📁 Project Structure
 
@@ -158,55 +182,76 @@ docu-man-app/
 │   │   ├── documentService.js
 │   │   └── interceptors.js
 │   ├── utils/            # Utility functions
+│   │   ├── cookies.js    # Cookie management
 │   │   ├── helpers.js
 │   │   └── validators.js
 │   ├── App.jsx           # Root component
 │   ├── custom.css        # Custom responsive styles
 │   ├── index.css         # Global styles
 │   └── main.jsx          # Application entry point
+├── .env.development      # Development environment config
+├── .env.production       # Production environment config
 ├── .env.example          # Environment variables template
 ├── .gitignore            # Git ignore rules
+├── DEPLOYMENT.md         # Deployment guide
 ├── index.html            # HTML template
 ├── package.json          # Project dependencies
 ├── README.md             # Project documentation
 └── vite.config.js        # Vite configuration
 ```
 
-## 🔌 Backend API Requirements
+## 🔌 Backend API
 
-The application expects the following API endpoints:
+**Base URL**: `https://apis.allsoft.co/api/documentManagement`
 
-### Authentication
-- `POST /sendOTP` - Send OTP to mobile number
-- `POST /verifyOTP` - Verify OTP and login
+### API Endpoints
 
-### Documents
-- `GET /documentTags` - Get all available tags
-- `POST /saveDocumentEntry` - Upload a document
-- `GET /searchDocumentEntry` - Search documents with filters
-- `GET /downloadDocument/:id` - Download a single document
-- `POST /downloadMultiple` - Download multiple documents as ZIP
-- `GET /previewDocument/:id` - Preview document (embed URL)
+### API Endpoints
 
-### Expected Request/Response Formats
+All endpoints require authentication except `/generateOTP` and `/validateOTP`.
 
-#### Login (sendOTP)
-```json
-// Request
-{ "mobile": "9876543210" }
-
-// Response
-{ "success": true, "message": "OTP sent successfully" }
+**Authentication Header**: All authenticated requests must include:
+```javascript
+headers: {
+  'token': '<auth-token>'
+}
 ```
 
-#### Verify OTP
+| Endpoint | Method | Auth | Description |
+|----------|--------|------|-------------|
+| `/generateOTP` | POST | No | Generate OTP for login |
+| `/validateOTP` | POST | No | Validate OTP and get token |
+| `/saveDocumentEntry` | POST | Yes | Upload document with metadata |
+| `/searchDocumentEntry` | POST | Yes | Search documents with filters |
+| `/documentTags` | POST | Yes | Get available tags |
+
+### Request/Response Formats
+
+#### Generate OTP
 ```json
 // Request
-{ "mobile": "9876543210", "otp": "123456" }
+{
+  "mobile_number": "9876543210"
+}
 
 // Response
 {
-  "success": true,
+  "status": true,
+  "message": "OTP sent successfully"
+}
+```
+
+#### Validate OTP
+```json
+// Request
+{
+  "mobile_number": "9876543210",
+  "otp": "123456"
+}
+
+// Response
+{
+  "status": true,
   "token": "jwt_token_here",
   "user": {
     "mobile": "9876543210",
@@ -218,33 +263,48 @@ The application expects the following API endpoints:
 #### Upload Document
 ```
 FormData with:
-- document: File
-- major_head: string
-- minor_head: string
-- tags: string (comma-separated)
-- document_date: string (YYYY-MM-DD)
-- document_remarks: string (optional)
+- file: File (the document to upload)
+- data: JSON string with:
+  {
+    "major_head": "Category",
+    "minor_head": "Subcategory",
+    "document_date": "12-02-2024",
+    "document_remarks": "Optional remarks",
+    "tags": [{"tag_name": "tag1"}, {"tag_name": "tag2"}],
+    "user_id": "username"
+  }
+
+Headers:
+- token: <auth-token>
 ```
 
 #### Search Documents
 ```json
-// Query params
+// Request
 {
-  "major_head": "Category",
-  "minor_head": "Subcategory",
-  "tags": "tag1,tag2",
-  "from_date": "2024-01-01",
-  "to_date": "2024-12-31"
+  "major_head": "",
+  "minor_head": "",
+  "from_date": "",
+  "to_date": "",
+  "tags": [{"tag_name": "tag1"}],
+  "uploaded_by": "",
+  "start": 0,
+  "length": 10,
+  "filterId": "",
+  "search": {
+    "value": ""
+  }
 }
+
+// Headers:
+// token: <auth-token>
 
 // Response
 {
   "documents": [
     {
       "id": 1,
-      "document_id": 1,
       "file_name": "document.pdf",
-      "document_name": "document.pdf",
       "major_head": "Category",
       "minor_head": "Subcategory",
       "tags": "tag1,tag2",
@@ -277,15 +337,28 @@ FormData with:
   - Development mode shows detailed error messages and stack traces
   - Production mode shows user-friendly error messages
 
-## 🔐 Authentication Flow
+## 🔐 Authentication & Security
+
+### Authentication Flow
 
 1. User enters 10-digit mobile number
-2. System sends OTP (simulated in demo)
+2. System sends OTP via backend API
 3. User enters 6-digit OTP
 4. System verifies OTP and returns JWT token
-5. Token stored in localStorage and injected in all API requests
-6. Auto-redirect to dashboard on successful login
-7. Logout clears token and redirects to login
+5. Token stored securely in HTTP cookies
+6. Token automatically included in all API requests via interceptors
+7. Auto-redirect to dashboard on successful login
+8. Logout clears cookies and redirects to login
+
+### Security Features
+
+- **Cookie-Based Storage**: Tokens stored in cookies instead of localStorage
+- **Secure Flag**: Cookies marked as Secure in production (HTTPS only)
+- **SameSite Protection**: SameSite=Strict for CSRF protection
+- **Auto-Expiration**: Cookies expire after 7 days
+- **Token Injection**: Automatic token inclusion in request headers
+- **Error Handling**: 401 errors automatically clear cookies and redirect to login
+- **HTTPS Required**: Production deployment requires HTTPS for cookie security
 
 ## 📝 Available Scripts
 
@@ -353,25 +426,33 @@ npm run lint
 - [ ] Created users list
 - [ ] Reset form
 
-## 🐛 Known Issues
+## 🐛 Known Issues & Notes
 
-1. **Backend Dependency**: The application requires a running backend API. Ensure the backend is accessible before starting the frontend.
+1. **HTTPS Required for Production**: Cookie security features (Secure flag) require HTTPS in production.
 
-2. **Static Admin Page**: The Admin page is UI-only and does not persist data. It's a demonstration of the interface.
+2. **Backend Dependency**: The application connects to `https://apis.allsoft.co/api/documentManagement`. Ensure the backend is accessible.
 
-3. **OTP in Demo**: If using a demo backend, OTP might be hardcoded (e.g., "123456") for testing purposes.
+3. **Static Admin Page**: The Admin page is UI-only and does not persist data. It's a demonstration of the interface.
 
-4. **Date Format**: Ensure backend accepts dates in YYYY-MM-DD format.
+4. **Test Mode**: Test credentials (9999999999 / 123456) only work in development mode.
 
-5. **File Size Limit**: Current limit is 10MB per file. Adjust validation if backend has different limits.
+5. **Date Format**: Backend expects dates in DD-MM-YYYY format.
+
+6. **File Size Limit**: Current limit is 10MB per file. Adjust validation if backend has different limits.
+
+7. **Cookie Expiration**: Auth cookies expire after 7 days. Users will need to login again.
 
 ## 🔧 Configuration
 
 ### Vite Configuration
 The `vite.config.js` is configured for:
 - Port: 3000
-- Host: 0.0.0.0 (network access)
+- Host: localhost
 - React plugin with Fast Refresh
+- Production optimizations:
+  - Code splitting (react-vendor, ui-vendor)
+  - Minification
+  - No source maps in production
 
 ### Bootstrap Customization
 Bootstrap is imported via CDN in `main.jsx`. To customize:

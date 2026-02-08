@@ -9,6 +9,7 @@ import authService from '../services/authService';
 // Master credentials for frontend testing (development only)
 const MASTER_MOBILE = '9999999999';
 const MASTER_OTP = '123456';
+const IS_DEVELOPMENT = import.meta.env.DEV;
 
 /**
  * Login Page Component
@@ -29,8 +30,8 @@ const LoginPage = () => {
     setMobileNumber(mobile);
     
     try {
-      // Check if using master mobile for frontend testing
-      if (mobile === MASTER_MOBILE) {
+      // Check if using master mobile for frontend testing (development only)
+      if (IS_DEVELOPMENT && mobile === MASTER_MOBILE) {
         toast.success('Test mode: OTP is 123456');
         setStep('otp');
         setLoading(false);
@@ -99,8 +100,8 @@ const LoginPage = () => {
     setLoading(true);
     
     try {
-      // Check if using master credentials for frontend testing
-      if (mobileNumber === MASTER_MOBILE && otp === MASTER_OTP) {
+      // Check if using master credentials for frontend testing (development only)
+      if (IS_DEVELOPMENT && mobileNumber === MASTER_MOBILE && otp === MASTER_OTP) {
         // Mock successful login for testing
         const mockToken = 'test_token_' + Date.now();
         const mockUser = {
@@ -229,14 +230,22 @@ const LoginPage = () => {
                     mobileNumber={mobileNumber}
                     onSubmit={handleVerifyOTP}
                     onResend={() => handleSendOTP(mobileNumber)}
+                    onBack={handleBackToMobile}
                     loading={loading}
                   />
-                )}  <small className="text-success d-block mt-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="me-1">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        Test Mode: Use mobile <strong>9999999999</strong> with OTP <strong>123456</strong>
-                      </small>
+                )}
+
+                {/* Test Mode Info - Only in Development */}
+                {IS_DEVELOPMENT && (
+                  <div className="text-center mt-3">
+                    <small className="text-success d-block">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="me-1">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      Test Mode: Use mobile <strong>9999999999</strong> with OTP <strong>123456</strong>
+                    </small>
+                  </div>
+                )}
                     
 
                 {/* Footer */}

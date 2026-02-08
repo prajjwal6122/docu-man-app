@@ -6,7 +6,7 @@ import './OTPForm.css';
  * OTP Form Component
  * Handles 6-digit OTP input with auto-focus and auto-advance
  */
-const OTPForm = ({ onSubmit, onResend, loading, mobileNumber = '' }) => {
+const OTPForm = ({ onSubmit, onResend, onBack, loading, mobileNumber = '' }) => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [resendTimer, setResendTimer] = useState(30);
@@ -123,6 +123,17 @@ const OTPForm = ({ onSubmit, onResend, loading, mobileNumber = '' }) => {
       >
         {loading ? 'Verifying...' : 'Verify OTP'}
       </Button>
+
+      {onBack && (
+        <button
+          type="button"
+          className="btn btn-outline-secondary w-100 mb-3"
+          onClick={onBack}
+          disabled={loading}
+        >
+          Back to Mobile Number
+        </button>
+      )}
 
       <div className="text-center">
         {canResend ? (

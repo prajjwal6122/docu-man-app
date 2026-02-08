@@ -1,9 +1,10 @@
 import apiClient from './apiClient';
+import { getCookie, clearAuthCookies } from '../utils/cookies';
 
 // Request interceptor - Add token to requests
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
+    const token = getCookie('authToken');
     if (token) {
       config.headers.token = token;
     }
@@ -25,7 +26,9 @@ apiClient.interceptors.response.use(
       const { status, data } = error.response;
       
       if (status === 401) {
-        // Unauthorized - clear token and redirect to login
+        // Unauthorized - clear cookies and redirect to login
+        clearAuthCookies();
+        // Also clear localStorage as fallback
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
         window.location.href = '/login';

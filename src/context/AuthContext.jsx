@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Initialize authentication state from localStorage
+  // Initialize authentication state from cookies
   useEffect(() => {
     const storedToken = authService.getToken();
     const storedUser = authService.getUser();
@@ -24,20 +24,19 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /**
-   * Login user and store credentials
+   * Login user and store credentials in cookies
    * @param {string} authToken - Authentication token
    * @param {object} userData - User data
    */
   const login = (authToken, userData) => {
-    localStorage.setItem('authToken', authToken);
-    localStorage.setItem('user', JSON.stringify(userData));
+    authService.saveAuth(authToken, userData);
     setToken(authToken);
     setUser(userData);
     setIsAuthenticated(true);
   };
 
   /**
-   * Logout user and clear credentials
+   * Logout user and clear cookies
    */
   const logout = () => {
     authService.logout();

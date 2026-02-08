@@ -1,5 +1,6 @@
 import apiClient from './apiClient';
 import './interceptors'; // Import interceptors to initialize them
+import { getCookie, setCookie, clearAuthCookies } from '../utils/cookies';
 
 const authService = {
   /**
@@ -32,11 +33,23 @@ const authService = {
   },
 
   /**
-   * Logout user
+   * Store authentication token and user data in cookies
+   * @param {string} token - Authentication token
+   * @param {object} userData - User data object
+   */
+  saveAuth(token, userData) {
+    setCookie('authToken', token, 7); // Store for 7 days
+    setCookie('user', JSON.stringify(userData), 7);
+  },
+
+  /**
+   * Logout user and clear cookies
    */
   logout() {
+    clearAuthCookies();
+    // Also clear localStorage as fallback for any legacy data
     localStorage.removeItem('authToken');
-    localStorage.removeItem ('user');
+    localStorage.removeItem('user');
   },
 
   /**
@@ -44,24 +57,32 @@ const authService = {
    * @returns {boolean}
    */
   isAuthenticated() {
-    return !!localStorage.getItem('authToken');
+    const token = getCookie('authToken');
+    return !!token;
   },
 
   /**
-   * Get stored token
+   * Get stored token from cookies
    * @returns {string|null}
    */
   getToken() {
-    return localStorage.getItem('authToken');
+    return getCookie('authToken');
   },
 
   /**
-   * Get stored user data
+   * Get stored user data from cookies
    * @returns {object|null}
    */
   getUser() {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    const userStr = getCookie('user');
+    if (!userStr) return null;
+    
+    try {
+      return JSON.parse(userStr);
+    } catch (error) {
+      console.error('Error parsing user data from cookie:', error);
+      return null;
+    }
   }
 };
 
