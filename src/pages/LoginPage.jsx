@@ -33,24 +33,19 @@ const LoginPage = () => {
     try {
       // Check if using master mobile for demo mode
       if (ENABLE_TEST_MODE && mobile === MASTER_MOBILE) {
-        console.log("✅ Demo mode activated for mobile:", mobile);
-        console.warn("⚠️ Demo mode: Mock token won't work with real API!");
+        console.log("🎯 Demo Mode activated - Use OTP: 123456");
         toast.success("Demo mode: OTP is 123456");
         setStep("otp");
         setLoading(false);
         return;
       }
-
-      console.log("📤 Sending OTP request for mobile:", mobile);
       
       // Call API to send OTP (works for both new and existing users)
       const response = await authService.generateOTP(mobile);
-      console.log("📥 OTP API Response:", response);
 
       // SUCCESS: Check if response indicates OTP was sent
       if (response.status === true || response.success === true) {
         const message = response.data || response.message || "OTP sent successfully";
-        console.log("✅ OTP sent successfully:", message);
         toast.success(message + " to " + mobile);
         setStep("otp");
         return;
@@ -59,11 +54,9 @@ const LoginPage = () => {
       // SPECIAL CASE: User not registered
       if (response.status === false && response.data) {
         const message = String(response.data).toLowerCase();
-        console.log("⚠️ API returned status false with message:", response.data);
         
         // If user is not registered - backend doesn't send OTP for unregistered users
         if (message.includes("not") && (message.includes("register") || message.includes("exist"))) {
-          console.error("❌ User not registered - OTP not sent");
           toast.error(response.data);
           toast.info("Please contact admin to register your mobile number first.", { duration: 5000 });
           return;
@@ -71,30 +64,22 @@ const LoginPage = () => {
         
         // If OTP was actually sent despite status false
         if (message.includes("otp") && message.includes("sent")) {
-          console.log("✅ OTP sent (status false but message says sent)");
           toast.success(response.data);
           setStep("otp");
           return;
         }
         
         // Other errors with status false
-        console.error("❌ API error:", response.data);
         toast.error(response.data || "Failed to send OTP");
         return;
       }
 
       // UNCLEAR RESPONSE: If we reach here, API response is unclear
-      console.warn("⚠️ Unclear API response:", response);
       toast.error("Unexpected response from server. Please try again.");
 
     } catch (error) {
-      console.error("❌ OTP Generation Error:", error);
-      console.error("Error Response:", error.response?.data);
-      console.error("Error Status:", error.response?.status);
-
       // Handle network/connection errors
       if (!error.response) {
-        console.error("❌ Network error - no response from server");
         toast.error("Network error. Please check your connection and try again.");
         return;
       }
@@ -114,7 +99,6 @@ const LoginPage = () => {
         const message = String(errorData.data).toLowerCase();
         
         if (message.includes("not") && (message.includes("register") || message.includes("exist"))) {
-          console.error("❌ User not registered - OTP not sent");
           toast.error(errorData.data);
           toast.info("Please contact admin to register your mobile number first.", { duration: 5000 });
           return;
@@ -122,7 +106,6 @@ const LoginPage = () => {
         
         // If error message mentions OTP was sent anyway
         if (message.includes("otp") && message.includes("sent")) {
-          console.log("✅ OTP sent (from error response)");
           toast.success(errorData.data);
           setStep("otp");
           return;
@@ -141,7 +124,6 @@ const LoginPage = () => {
         errorMessage = error.message;
       }
 
-      console.error("❌ Final error message:", errorMessage);
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -159,9 +141,7 @@ const LoginPage = () => {
         mobileNumber === MASTER_MOBILE &&
         otp === MASTER_OTP
       ) {
-        console.log("✅ Demo mode login activated");
-        console.warn("⚠️ WARNING: Mock token won't work with real API endpoints!");
-        console.warn("⚠️ Use a real mobile number to test API functionality");
+        console.log("🎯 Demo Mode login - Mock data active");
         // Mock successful login for demo mode
         const mockToken = "test_token_" + Date.now();
         const mockUser = {
